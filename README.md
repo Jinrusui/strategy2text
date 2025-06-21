@@ -45,28 +45,9 @@ python scripts/download_rl_zoo_models.py --algorithm ppo
 python scripts/download_rl_zoo_models.py --algorithm dqn
 ```
 
-### 3. Run Agent Demo
+### 3. Strategy Analysis with Gemini
 
 ```bash
-# Run PPO agent (default)
-python scripts/demo_breakout.py
-
-# Run DQN agent
-python scripts/demo_breakout.py --algorithm dqn
-
-# Run with video recording
-python scripts/demo_breakout.py --algorithm ppo --save-video
-
-# Run multiple episodes
-python scripts/demo_breakout.py --algorithm ppo --episodes 5
-```
-
-### 4. Strategy Analysis with Gemini
-
-```bash
-# Run strategy analysis demo (requires Gemini API key)
-python scripts/demo_gemini_analysis.py
-
 # Analyze a single video
 python -c "
 from src.gemini_analysis import StrategyAnalyzer
@@ -76,12 +57,9 @@ print(result['strategy_summary'])
 "
 ```
 
-### 5. Check Available Models
+### 4. Check Available Models
 
 ```bash
-# List downloaded models
-python scripts/demo_breakout.py --list
-
 # Verify downloads
 python scripts/download_rl_zoo_models.py --verify
 ```
@@ -101,8 +79,8 @@ The following pre-trained algorithms are available for Breakout:
 strategy2text/
 ├── scripts/                     # Main scripts
 │   ├── download_rl_zoo_models.py    # Download pre-trained models
-│   ├── demo_breakout.py             # Run agent demos
-│   └── demo_gemini_analysis.py      # Strategy analysis demo
+│   ├── setup.py                     # Installation script
+│   └── troubleshoot.py              # Troubleshooting utilities
 ├── src/                         # Source code
 │   ├── gemini_analysis/         # Gemini-based strategy analysis
 │   │   ├── gemini_client.py         # Gemini API interface
@@ -124,29 +102,28 @@ strategy2text/
 
 ## Usage Examples
 
-### Basic Demo
+### Basic Strategy Analysis
 ```bash
-# Run 3 episodes with PPO agent
-python scripts/demo_breakout.py --algorithm ppo --episodes 3
+# Analyze a video with strategy-focused approach
+python -c "
+from src.gemini_analysis import StrategyAnalyzer
+analyzer = StrategyAnalyzer('videos')
+result = analyzer.analyze_single_video('path/to/video.mp4', analysis_type='strategy')
+print(result['strategy_summary'])
+"
 ```
 
-### Performance Comparison
+### Comparative Analysis
 ```bash
-# Compare different algorithms
-python scripts/demo_breakout.py --algorithm ppo --episodes 5
-python scripts/demo_breakout.py --algorithm dqn --episodes 5
-```
-
-### Video Recording
-```bash
-# Record gameplay videos
-python scripts/demo_breakout.py --algorithm ppo --save-video --episodes 2
-```
-
-### Headless Mode (No Display)
-```bash
-# Run without rendering (faster, for performance testing)
-python scripts/demo_breakout.py --algorithm ppo --no-render --episodes 10
+# Compare strategy vs baseline analysis
+python -c "
+from src.gemini_analysis import StrategyAnalyzer
+analyzer = StrategyAnalyzer('videos')
+strategy_result = analyzer.analyze_single_video('video.mp4', analysis_type='strategy')
+baseline_result = analyzer.analyze_single_video('video.mp4', analysis_type='baseline')
+print('Strategy:', strategy_result['abstraction_score']['abstraction_score'])
+print('Baseline:', baseline_result['abstraction_score']['abstraction_score'])
+"
 ```
 
 ## Model Information
@@ -192,12 +169,7 @@ If you encounter segmentation faults during package imports:
    python scripts/download_rl_zoo_models.py --algorithm ppo
    ```
 
-4. **Display issues on headless systems**:
-   ```bash
-   python scripts/demo_breakout.py --no-render
-   ```
-
-5. **Run the troubleshooter**:
+4. **Run the troubleshooter**:
    ```bash
    python scripts/troubleshoot.py
    ```
@@ -214,8 +186,7 @@ If you encounter segmentation faults during package imports:
 The codebase is designed to be easily extensible for additional algorithms and environments. To add support for new agents:
 
 1. Add algorithm to `BREAKOUT_MODELS` in `download_rl_zoo_models.py`
-2. Update the choices in `demo_breakout.py`
-3. Ensure the algorithm is supported in `src/rl_agents/sb3_agent.py`
+2. Ensure the algorithm is supported in `src/rl_agents/sb3_agent.py`
 
 ## Credits
 
