@@ -1,147 +1,164 @@
 """
-Video loader utility for handling video files and metadata.
+Simple video loader utility for RL agent recordings.
 """
 
 import os
-import json
+import logging
+from typing import List, Optional, Dict
 from pathlib import Path
-from typing import Dict, List, Optional, Any
-import cv2
 
 
 class VideoLoader:
-    """Utility class for loading and managing video files."""
+    """Utility for loading and validating RL agent video files."""
     
-    def __init__(self, video_dir: str):
+    SUPPORTED_FORMATS = {'.mp4', '.avi', '.mov', '.mkv', '.webm'}
+    
+    def __init__(self):
+        """Initialize the video loader."""
+        self.logger = logging.getLogger(__name__)
+    
+    def find_videos(self, directory: str, recursive: bool = True) -> List[str]:
         """
-        Initialize video loader.
+        Find all video files in a directory.
         
         Args:
-            video_dir: Directory containing video files
-        """
-        self.video_dir = Path(video_dir)
-        self.supported_formats = ['.mp4', '.avi', '.mov', '.mkv', '.wmv']
-    
-    def load_video_list(self) -> List[Dict[str, Any]]:
-        """
-        Load list of all video files in directory.
-        
-        Returns:
-            List of video metadata dictionaries
-        """
-        videos = []
-        
-        for video_file in self.video_dir.rglob('*'):
-            if video_file.suffix.lower() in self.supported_formats:
-                metadata = self._get_video_metadata(video_file)
-                videos.append(metadata)
-        
-        return videos
-    
-    def _get_video_metadata(self, video_path: Path) -> Dict[str, Any]:
-        """
-        Extract metadata from video file.
-        
-        Args:
-            video_path: Path to video file
+            directory: Directory path to search
+            recursive: Whether to search subdirectories
             
         Returns:
-            Dictionary containing video metadata
+            List of video file paths
         """
-        metadata = {
-            'filepath': str(video_path),
-            'filename': video_path.name,
-            'size_bytes': video_path.stat().st_size,
-            'extension': video_path.suffix.lower()
-        }
+        directory = Path(directory)
+        if not directory.exists():
+            self.logger.warning(f"Directory does not exist: {directory}")
+            return []
         
-        # Try to get video properties
-        try:
-            cap = cv2.VideoCapture(str(video_path))
-            if cap.isOpened():
-                metadata.update({
-                    'width': int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                    'height': int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-                    'fps': cap.get(cv2.CAP_PROP_FPS),
-                    'frame_count': int(cap.get(cv2.CAP_PROP_FRAME_COUNT)),
-                    'duration': cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS)
-                })
-                cap.release()
-        except Exception:
-            # If we can't read video properties, set defaults
-            metadata.update({
-                'width': None,
-                'height': None,
-                'fps': None,
-                'frame_count': None,
-                'duration': None
-            })
+        video_files = []
         
-        return metadata
+        if recursive:
+            pattern = "**/*"
+        else:
+            pattern = "*"
+        
+        for file_path in directory.glob(pattern):
+            if file_path.is_file() and file_path.suffix.lower() in self.SUPPORTED_FORMATS:
+                video_files.append(str(file_path))
+        
+        self.logger.info(f"Found {len(video_files)} video files in {directory}")
+        return sorted(video_files)
     
     def validate_video(self, video_path: str) -> bool:
         """
-        Validate that a video file can be opened and read.
+        Validate that a video file exists and has a supported format.
         
         Args:
-            video_path: Path to video file
+            video_path: Path to the video file
             
         Returns:
             True if video is valid, False otherwise
         """
-        try:
-            cap = cv2.VideoCapture(video_path)
-            if not cap.isOpened():
-                return False
-            
-            # Try to read first frame
-            ret, frame = cap.read()
-            cap.release()
-            
-            return ret and frame is not None
-            
-        except Exception:
+        video_path = Path(video_path)
+        
+        if not video_path.exists():
+            self.logger.error(f"Video file does not exist: {video_path}")
             return False
+        
+        if not video_path.is_file():
+            self.logger.error(f"Path is not a file: {video_path}")
+            return False
+        
+        if video_path.suffix.lower() not in self.SUPPORTED_FORMATS:
+            self.logger.error(f"Unsupported video format: {video_path.suffix}")
+            return False
+        
+        # Check file size (should be > 0)
+        if video_path.stat().st_size == 0:
+            self.logger.error(f"Video file is empty: {video_path}")
+            return False
+        
+        return True
     
-    def filter_videos(
-        self, 
-        videos: List[Dict[str, Any]], 
-        **criteria
-    ) -> List[Dict[str, Any]]:
+    def get_video_info(self, video_path: str) -> Optional[Dict[str, any]]:
         """
-        Filter videos based on criteria.
+        Get basic information about a video file.
         
         Args:
-            videos: List of video metadata
-            **criteria: Filtering criteria
+            video_path: Path to the video file
             
         Returns:
-            Filtered list of videos
+            Dictionary with video information or None if invalid
         """
-        filtered = videos.copy()
+        if not self.validate_video(video_path):
+            return None
         
-        # Filter by minimum duration
-        if 'min_duration' in criteria:
-            min_dur = criteria['min_duration']
-            filtered = [v for v in filtered if v.get('duration', 0) >= min_dur]
+        video_path = Path(video_path)
+        stat = video_path.stat()
         
-        # Filter by maximum duration
-        if 'max_duration' in criteria:
-            max_dur = criteria['max_duration']
-            filtered = [v for v in filtered if v.get('duration', float('inf')) <= max_dur]
+        return {
+            "path": str(video_path),
+            "name": video_path.name,
+            "size_bytes": stat.st_size,
+            "size_mb": round(stat.st_size / (1024 * 1024), 2),
+            "format": video_path.suffix.lower(),
+            "modified_time": stat.st_mtime
+        }
+    
+    def filter_by_pattern(self, video_paths: List[str], pattern: str) -> List[str]:
+        """
+        Filter video paths by a filename pattern.
         
-        # Filter by resolution
-        if 'min_width' in criteria:
-            min_w = criteria['min_width']
-            filtered = [v for v in filtered if v.get('width', 0) >= min_w]
+        Args:
+            video_paths: List of video file paths
+            pattern: Pattern to match (e.g., "ppo", "breakout")
+            
+        Returns:
+            Filtered list of video paths
+        """
+        pattern = pattern.lower()
+        filtered = []
         
-        if 'min_height' in criteria:
-            min_h = criteria['min_height']
-            filtered = [v for v in filtered if v.get('height', 0) >= min_h]
+        for video_path in video_paths:
+            filename = Path(video_path).name.lower()
+            if pattern in filename:
+                filtered.append(video_path)
         
-        # Filter by file extension
-        if 'extensions' in criteria:
-            exts = criteria['extensions']
-            filtered = [v for v in filtered if v.get('extension') in exts]
+        self.logger.info(f"Filtered {len(video_paths)} videos to {len(filtered)} matching '{pattern}'")
+        return filtered
+    
+    def group_by_environment(self, video_paths: List[str]) -> Dict[str, List[str]]:
+        """
+        Group video paths by detected environment name (Breakout only).
         
-        return filtered 
+        Args:
+            video_paths: List of video file paths
+            
+        Returns:
+            Dictionary mapping environment names to video paths
+        """
+        # Only Breakout environment patterns
+        env_patterns = {
+            'breakout': ['breakout', 'break-out', 'break_out'],
+        }
+        
+        groups = {}
+        unmatched = []
+        
+        for video_path in video_paths:
+            filename = Path(video_path).name.lower()
+            matched = False
+            
+            for env_name, patterns in env_patterns.items():
+                if any(pattern in filename for pattern in patterns):
+                    if env_name not in groups:
+                        groups[env_name] = []
+                    groups[env_name].append(video_path)
+                    matched = True
+                    break
+            
+            if not matched:
+                unmatched.append(video_path)
+        
+        if unmatched:
+            groups['unknown'] = unmatched
+        
+        return groups 
