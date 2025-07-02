@@ -11,87 +11,116 @@ import re
 from .gemini_client import GeminiClient
 
 
-class BehaviorAnalyzer:
-    """Analyzes low-level behaviors of RL agents from video recordings using Gemini AI."""
+class BreakoutBehaviorAnalyzer:
+    """Analyzes low-level behaviors of Breakout RL agents from video recordings using Gemini AI."""
     
-    def __init__(self, api_key: Optional[str] = None, model: str = "gemini-2.5-flash-preview-05-20"):
+    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         """
-        Initialize the behavior analyzer.
+        Initialize the Breakout behavior analyzer.
         
         Args:
             api_key: Google API key for Gemini
-            model: Gemini model to use (using the model from user's example)
+            model: Model to use for analysis. If None, uses default model
         """
         self.gemini_client = GeminiClient(api_key=api_key, model=model)
         self.logger = logging.getLogger(__name__)
         
-        # System prompt for low-level behavior analysis
-        self.behavior_prompt = self._get_behavior_analysis_prompt()
+        # Load the analysis prompt from file
+        self.analysis_prompt = self._load_behavior_prompt()
     
-    def _get_behavior_analysis_prompt(self) -> str:
-        """Get the system prompt for low-level behavior analysis."""
+    def _load_behavior_prompt(self) -> str:
+        """Load the Breakout behavior analysis prompt from the text file."""
+        prompt_file = Path("prompts/behavior_prompt.txt")
+        try:
+            with open(prompt_file, 'r') as f:
+                return f.read().strip()
+        except FileNotFoundError:
+            self.logger.warning(f"Prompt file {prompt_file} not found, using default prompt")
+            return self._get_default_prompt()
+    
+    def _get_default_prompt(self) -> str:
+        """Fallback prompt if file is not found."""
         return """
-You are an expert in reinforcement learning and game analysis. Your task is to analyze the low-level behaviors and actions of an RL agent in this video.
+You are an expert in reinforcement learning and Breakout game analysis. Analyze the low-level behaviors and actions of this Breakout RL agent."""
 
-Focus on the following aspects of low-level behavior:
 
-1. **Immediate Actions & Reactions**:
-   - Frame-by-frame action sequences
-   - Reaction times to environmental changes
-   - Precision and timing of individual moves
-   - Micro-adjustments and fine-grained control
+# """
+# Focus on LOW-LEVEL BEHAVIORAL elements:
 
-2. **Movement Patterns**:
-   - Speed and acceleration patterns
-   - Direction changes and their frequency
-   - Hesitation or uncertainty in movements
-   - Repetitive motion patterns or habits
+# 1. **Immediate Actions & Reactions**:
+#    - Frame-by-frame paddle movements and responses
+#    - Reaction times to ball position changes
+#    - Precision and timing of paddle positioning
+#    - Micro-adjustments and fine-grained paddle control
 
-3. **Decision-Making Process**:
-   - How quickly decisions are made
-   - Evidence of exploration vs exploitation
-   - Response to immediate threats or opportunities
-   - Local optimization behaviors
+# 2. **Movement Patterns**:
+#    - Paddle speed and acceleration patterns
+#    - Direction changes and movement frequency
+#    - Hesitation or uncertainty in paddle movements
+#    - Repetitive motion patterns or habits
 
-4. **Technical Execution**:
-   - Accuracy of actions relative to game mechanics
-   - Consistency in similar situations
-   - Error patterns and recovery behaviors
-   - Adaptation to changing conditions
+# 3. **Ball Tracking & Response**:
+#    - How quickly the agent responds to ball direction changes
+#    - Accuracy of paddle positioning relative to ball trajectory
+#    - Evidence of predictive vs reactive behavior
+#    - Response consistency across different ball speeds
 
-Please provide a detailed analysis of these low-level behaviors observed in the video. Focus on what the agent is actually doing moment-to-moment rather than high-level strategic thinking.
+# 4. **Technical Execution**:
+#    - Precision of paddle movements within game constraints
+#    - Consistency in similar ball-paddle interaction scenarios
+#    - Error patterns and recovery behaviors
+#    - Micro-level decision making in paddle control
 
-Summarize your findings in exactly 3 sentences that capture the most important low-level behavioral characteristics.
-"""
+# 5. **Breakout-Specific Behaviors**:
+#    - Paddle positioning strategy for different ball angles
+#    - Response to ball bouncing off different surfaces
+#    - Behavior when ball approaches paddle edges vs center
+#    - Timing accuracy for successful ball returns
+
+# Please provide a detailed analysis of these low-level behaviors observed in the video. Focus on what the agent is actually doing moment-to-moment rather than high-level strategic thinking.
+
+# Summarize your findings in exactly 3 sentences that capture the most important low-level behavioral characteristics.
+# """
+
+
     
-    def analyze_behavior(self, video_path: str) -> Dict[str, Any]:
+    def analyze_breakout_behavior(self, video_path: str, fps: int = 5) -> Dict[str, Any]:
         """
-        Analyze the low-level behavior of an RL agent from a video recording.
+        Analyze the low-level behavior of a Breakout RL agent from a video recording using direct video processing.
         
         Args:
             video_path: Path to the video file
+            fps: Frame sampling rate for video analysis (configurable hyperparameter: 5, 10, etc.)
             
         Returns:
             Dictionary containing behavior analysis
         """
         try:
-            # Check file size (should be <20MB as per user's example)
+            # Check file size (should be <20MB for direct upload)
             video_file = Path(video_path)
             if not video_file.exists():
                 raise FileNotFoundError(f"Video file not found: {video_path}")
             
             file_size_mb = video_file.stat().st_size / (1024 * 1024)
             if file_size_mb >= 20:
-                self.logger.warning(f"Video file size ({file_size_mb:.1f}MB) is >= 20MB, may cause issues")
+                self.logger.warning(f"Video file size ({file_size_mb:.1f}MB) is >= 20MB, may cause issues with low-level analysis")
             
-            analysis_text = self.gemini_client.analyze_video_direct(video_path, self.behavior_prompt)
+            # Use low-level analysis method with direct video bytes
+            analysis_text = self.gemini_client.analyze_video_low_level(
+                video_path, 
+                self.analysis_prompt, 
+                fps=fps
+            )
             
             # Parse and structure the analysis
             behavior_summary = self._parse_behavior_analysis(analysis_text)
             
             return {
                 "video_path": video_path,
+                "environment": "Breakout",
                 "analysis_type": "low_level_behavior",
+                "model": self.gemini_client.model,
+                "fps": fps,
                 "raw_analysis": analysis_text,
                 "behavior_summary": behavior_summary,
                 "file_size_mb": file_size_mb,
@@ -102,17 +131,23 @@ Summarize your findings in exactly 3 sentences that capture the most important l
             self.logger.error(f"Failed to analyze behavior for {video_path}: {str(e)}")
             return {
                 "video_path": video_path,
+                "environment": "Breakout",
                 "analysis_type": "low_level_behavior",
+                "model": self.gemini_client.model,
+                "fps": fps,
                 "error": str(e),
                 "timestamp": self._get_timestamp()
             }
     
-    def batch_analyze_behaviors(self, video_paths: List[str]) -> List[Dict[str, Any]]:
+
+    
+    def batch_analyze_breakout_behaviors(self, video_paths: List[str], fps: int = 5) -> List[Dict[str, Any]]:
         """
-        Analyze behaviors across multiple videos.
+        Analyze behaviors across multiple Breakout videos using low-level analysis.
         
         Args:
             video_paths: List of video file paths
+            fps: Frame sampling rate for video analysis (configurable hyperparameter: 5, 10, etc.)
             
         Returns:
             List of behavior analysis results
@@ -121,18 +156,21 @@ Summarize your findings in exactly 3 sentences that capture the most important l
         
         for video_path in video_paths:
             self.logger.info(f"Analyzing behavior for: {video_path}")
-            analysis = self.analyze_behavior(video_path)
+            analysis = self.analyze_breakout_behavior(video_path, fps=fps)
             results.append(analysis)
         
         return results
+    
+
     
     def _parse_behavior_analysis(self, analysis_text: str) -> Dict[str, str]:
         """Parse the analysis text into structured components."""
         sections = {
             "immediate_actions": "",
             "movement_patterns": "",
-            "decision_making": "",
+            "ball_tracking": "",
             "technical_execution": "",
+            "breakout_specific": "",
             "summary": ""
         }
         
@@ -150,10 +188,12 @@ Summarize your findings in exactly 3 sentences that capture the most important l
                 current_section = "immediate_actions"
             elif "movement" in line.lower() and "pattern" in line.lower():
                 current_section = "movement_patterns"
-            elif "decision" in line.lower() and "making" in line.lower():
-                current_section = "decision_making"
+            elif "ball" in line.lower() and ("tracking" in line.lower() or "response" in line.lower()):
+                current_section = "ball_tracking"
             elif "technical" in line.lower() and "execution" in line.lower():
                 current_section = "technical_execution"
+            elif "breakout" in line.lower() and ("specific" in line.lower() or "behavior" in line.lower()):
+                current_section = "breakout_specific"
             elif current_section and line:
                 sections[current_section] += line + " "
         
@@ -165,7 +205,7 @@ Summarize your findings in exactly 3 sentences that capture the most important l
         else:
             sections["summary"] = analysis_text
         
-        return sections
+        return {k: v.strip() for k, v in sections.items()}
     
     def _get_timestamp(self) -> str:
         """Get current timestamp."""
@@ -173,9 +213,13 @@ Summarize your findings in exactly 3 sentences that capture the most important l
         return datetime.now().isoformat()
     
     def save_analysis(self, analysis: Dict[str, Any], output_path: str):
-        """Save analysis results to JSON file."""
+        """Save analysis results to a JSON file."""
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        
         with open(output_path, 'w') as f:
             json.dump(analysis, f, indent=2)
+        
         self.logger.info(f"Analysis saved to {output_path}")
     
     def __enter__(self):
@@ -184,4 +228,4 @@ Summarize your findings in exactly 3 sentences that capture the most important l
     
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Context manager exit."""
-        self.gemini_client.cleanup_uploaded_files() 
+        self.gemini_client.cleanup_uploaded_files()

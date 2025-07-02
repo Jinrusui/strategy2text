@@ -5,8 +5,8 @@ ALGO="ppo"
 ENV="BreakoutNoFrameskip-v4"
 FOLDER="rl-trained-agents"
 OUTPUT_DIR="videos/${ALGO}/${ENV}"
-TIMESTEPS=5000
-SEEDS=(56 78 94 25 66)
+TIMESTEPS=2000
+SEEDS=(123 56 78 94 25)
 
 mkdir -p "$OUTPUT_DIR"
 

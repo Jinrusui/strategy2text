@@ -97,9 +97,9 @@ video_paths = loader.find_videos("videos/")
 behavior_analyzer = BehaviorAnalyzer()
 behavior_results = behavior_analyzer.batch_analyze_behaviors(video_paths)
 
-# Compare strategies across multiple videos
+# Batch analyze strategies
 strategy_analyzer = BreakoutStrategyAnalyzer()
-strategy_comparison = strategy_analyzer.compare_breakout_strategies(video_paths)
+strategy_results = strategy_analyzer.batch_analyze_breakout_strategies(video_paths)
 ```
 
 ## 🏗️ Architecture
@@ -147,7 +147,7 @@ Focuses on **high-level strategic thinking**:
 ### Analysis Capabilities
 - ✅ Single video analysis with detailed breakdowns
 - ✅ Batch analysis across multiple videos
-- ✅ Comparative analysis between different agents
+
 - ✅ Structured JSON output for further processing
 - ✅ Error handling and retry logic
 - ✅ Context manager support for proper cleanup
