@@ -1,5 +1,6 @@
 """
-Low-level behavior analyzer for RL agent videos using Gemini AI.
+Behavior analyzer that integrates with HVA-X hierarchical video analysis.
+Provides both standalone analysis and integration with the main HVA-X algorithm.
 """
 
 import json
@@ -9,10 +10,14 @@ from pathlib import Path
 import re
 
 from .gemini_client import GeminiClient
+from .hva_analyzer import HVAAnalyzer
 
 
 class BreakoutBehaviorAnalyzer:
-    """Analyzes low-level behaviors of Breakout RL agents from video recordings using Gemini AI."""
+    """
+    Analyzes low-level behaviors of Breakout RL agents.
+    Can be used standalone or as part of HVA-X hierarchical analysis.
+    """
     
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         """
@@ -41,52 +46,50 @@ class BreakoutBehaviorAnalyzer:
     def _get_default_prompt(self) -> str:
         """Fallback prompt if file is not found."""
         return """
-You are an expert in reinforcement learning and Breakout game analysis. Analyze the low-level behaviors and actions of this Breakout RL agent."""
+You are an expert in reinforcement learning and Breakout game analysis. 
 
+Analyze the low-level behaviors and micro-actions of this Breakout RL agent from the gameplay video.
 
-# """
-# Focus on LOW-LEVEL BEHAVIORAL elements:
+Focus on LOW-LEVEL BEHAVIORAL elements:
 
-# 1. **Immediate Actions & Reactions**:
-#    - Frame-by-frame paddle movements and responses
-#    - Reaction times to ball position changes
-#    - Precision and timing of paddle positioning
-#    - Micro-adjustments and fine-grained paddle control
+1. **Immediate Actions & Reactions**:
+   - Frame-by-frame paddle movements and responses
+   - Reaction times to ball position changes
+   - Precision and timing of paddle positioning
+   - Micro-adjustments and fine-grained paddle control
 
-# 2. **Movement Patterns**:
-#    - Paddle speed and acceleration patterns
-#    - Direction changes and movement frequency
-#    - Hesitation or uncertainty in paddle movements
-#    - Repetitive motion patterns or habits
+2. **Movement Patterns**:
+   - Paddle speed and acceleration patterns
+   - Direction changes and movement frequency
+   - Hesitation or uncertainty in paddle movements
+   - Repetitive motion patterns or habits
 
-# 3. **Ball Tracking & Response**:
-#    - How quickly the agent responds to ball direction changes
-#    - Accuracy of paddle positioning relative to ball trajectory
-#    - Evidence of predictive vs reactive behavior
-#    - Response consistency across different ball speeds
+3. **Ball Tracking & Response**:
+   - How quickly the agent responds to ball direction changes
+   - Accuracy of paddle positioning relative to ball trajectory
+   - Evidence of predictive vs reactive behavior
+   - Response consistency across different ball speeds
 
-# 4. **Technical Execution**:
-#    - Precision of paddle movements within game constraints
-#    - Consistency in similar ball-paddle interaction scenarios
-#    - Error patterns and recovery behaviors
-#    - Micro-level decision making in paddle control
+4. **Technical Execution**:
+   - Precision of paddle movements within game constraints
+   - Consistency in similar ball-paddle interaction scenarios
+   - Error patterns and recovery behaviors
+   - Micro-level decision making in paddle control
 
-# 5. **Breakout-Specific Behaviors**:
-#    - Paddle positioning strategy for different ball angles
-#    - Response to ball bouncing off different surfaces
-#    - Behavior when ball approaches paddle edges vs center
-#    - Timing accuracy for successful ball returns
+5. **Breakout-Specific Behaviors**:
+   - Paddle positioning strategy for different ball angles
+   - Response to ball bouncing off different surfaces
+   - Behavior when ball approaches paddle edges vs center
+   - Timing accuracy for successful ball returns
 
-# Please provide a detailed analysis of these low-level behaviors observed in the video. Focus on what the agent is actually doing moment-to-moment rather than high-level strategic thinking.
+Please provide a detailed analysis of these low-level behaviors observed in the video. Focus on what the agent is actually doing moment-to-moment rather than high-level strategic thinking.
 
-# Summarize your findings in exactly 3 sentences that capture the most important low-level behavioral characteristics.
-# """
-
-
+Conclude with a 3-sentence summary that captures the most important low-level behavioral characteristics.
+"""
     
     def analyze_breakout_behavior(self, video_path: str, fps: int = 5) -> Dict[str, Any]:
         """
-        Analyze the low-level behavior of a Breakout RL agent from a video recording using direct video processing.
+        Analyze the low-level behavior of a Breakout RL agent from a video recording.
         
         Args:
             video_path: Path to the video file
@@ -139,8 +142,6 @@ You are an expert in reinforcement learning and Breakout game analysis. Analyze 
                 "timestamp": self._get_timestamp()
             }
     
-
-    
     def batch_analyze_breakout_behaviors(self, video_paths: List[str], fps: int = 5) -> List[Dict[str, Any]]:
         """
         Analyze behaviors across multiple Breakout videos using low-level analysis.
@@ -161,7 +162,31 @@ You are an expert in reinforcement learning and Breakout game analysis. Analyze 
         
         return results
     
-
+    def run_hva_analysis(self, video_dir: str, score_file: str, 
+                        samples_per_tier: int = 3) -> Dict[str, Any]:
+        """
+        Run complete HVA-X analysis focusing on behavioral aspects.
+        
+        Args:
+            video_dir: Directory containing video files
+            score_file: Path to file containing episode scores
+            samples_per_tier: Number of samples per performance tier
+            
+        Returns:
+            Complete HVA-X analysis results
+        """
+        self.logger.info("Running HVA-X analysis with behavioral focus")
+        
+        # Create HVA analyzer instance
+        hva_analyzer = HVAAnalyzer(
+            api_key=self.gemini_client.api_key, 
+            model=self.gemini_client.model
+        )
+        
+        # Run full HVA-X analysis
+        return hva_analyzer.analyze_agent_from_directory(
+            video_dir, score_file, samples_per_tier
+        )
     
     def _parse_behavior_analysis(self, analysis_text: str) -> Dict[str, str]:
         """Parse the analysis text into structured components."""
@@ -198,29 +223,36 @@ You are an expert in reinforcement learning and Breakout game analysis. Analyze 
                 sections[current_section] += line + " "
         
         # Extract summary (last 3 sentences or sentences that appear to be summary)
-        sentences = re.split(r'[.!?]+', analysis_text)
-        sentences = [s.strip() for s in sentences if s.strip()]
-        if len(sentences) >= 3:
-            sections["summary"] = '. '.join(sentences[-3:]) + '.'
-        else:
-            sections["summary"] = analysis_text
+        summary_lines = []
+        for line in reversed(lines):
+            if line.strip() and ('summary' in line.lower() or 'conclusion' in line.lower() or 
+                              'overall' in line.lower() or len(summary_lines) < 3):
+                summary_lines.append(line.strip())
+                if len(summary_lines) >= 3:
+                    break
         
-        return {k: v.strip() for k, v in sections.items()}
+        sections["summary"] = " ".join(reversed(summary_lines))
+        
+        # Clean up sections
+        for key in sections:
+            sections[key] = sections[key].strip()
+        
+        return sections
     
     def _get_timestamp(self) -> str:
-        """Get current timestamp."""
+        """Get current timestamp as string."""
         from datetime import datetime
         return datetime.now().isoformat()
     
     def save_analysis(self, analysis: Dict[str, Any], output_path: str):
         """Save analysis results to a JSON file."""
-        output_path = Path(output_path)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_file = Path(output_path)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
         
-        with open(output_path, 'w') as f:
+        with open(output_file, 'w') as f:
             json.dump(analysis, f, indent=2)
         
-        self.logger.info(f"Analysis saved to {output_path}")
+        self.logger.info(f"Analysis saved to {output_file}")
     
     def __enter__(self):
         """Context manager entry."""

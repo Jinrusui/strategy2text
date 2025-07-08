@@ -1,5 +1,6 @@
 """
-Strategy analyzer for Breakout RL agent videos using Gemini AI.
+Strategy analyzer that integrates with HVA-X hierarchical video analysis.
+Provides both standalone analysis and integration with the main HVA-X algorithm.
 """
 
 import json
@@ -8,10 +9,14 @@ from typing import Dict, List, Optional, Any
 from pathlib import Path
 
 from .gemini_client import GeminiClient
+from .hva_analyzer import HVAAnalyzer
 
 
 class BreakoutStrategyAnalyzer:
-    """Analyzes Breakout RL agent strategies from video recordings using Gemini AI."""
+    """
+    Analyzes high-level strategies of Breakout RL agents.
+    Can be used standalone or as part of HVA-X hierarchical analysis.
+    """
     
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         """
@@ -40,7 +45,9 @@ class BreakoutStrategyAnalyzer:
     def _get_default_prompt(self) -> str:
         """Fallback prompt if file is not found."""
         return """
-You are an expert in reinforcement learning and strategic game analysis. Analyze the overall strategic approach of this Breakout RL agent.
+You are an expert in reinforcement learning and strategic game analysis. 
+
+Analyze the overall strategic approach and high-level decision-making of this Breakout RL agent from the gameplay video.
 
 Focus on HIGH-LEVEL STRATEGIC elements:
 
@@ -75,11 +82,13 @@ Focus on HIGH-LEVEL STRATEGIC elements:
    - Comparison to optimal strategic approaches
 
 Please provide a comprehensive analysis focusing on the STRATEGIC aspects rather than moment-to-moment actions. Evaluate the agent's strategic intelligence and planning capabilities.
+
+Conclude with a 3-sentence summary that captures the agent's strategic profile and effectiveness.
 """
     
     def analyze_breakout_strategy(self, video_path: str) -> Dict[str, Any]:
         """
-        Analyze the strategy of a Breakout RL agent from a video recording using high-level analysis.
+        Analyze the strategy of a Breakout RL agent from a video recording.
         
         Args:
             video_path: Path to the video file
@@ -91,12 +100,16 @@ Please provide a comprehensive analysis focusing on the STRATEGIC aspects rather
             # Use high-level analysis method with file upload
             analysis_text = self.gemini_client.analyze_video_high_level(video_path, self.analysis_prompt)
             
+            # Parse and structure the analysis
+            strategy_summary = self._parse_strategy_analysis(analysis_text)
+            
             return {
                 "video_path": video_path,
                 "environment": "Breakout",
                 "analysis_type": "high_level_strategy",
                 "model": self.gemini_client.model,
                 "raw_analysis": analysis_text,
+                "strategy_summary": strategy_summary,
                 "timestamp": self._get_timestamp()
             }
             
@@ -129,6 +142,83 @@ Please provide a comprehensive analysis focusing on the STRATEGIC aspects rather
             results.append(analysis)
         
         return results
+    
+    def run_hva_analysis(self, video_dir: str, score_file: str, 
+                        samples_per_tier: int = 3) -> Dict[str, Any]:
+        """
+        Run complete HVA-X analysis focusing on strategic aspects.
+        
+        Args:
+            video_dir: Directory containing video files
+            score_file: Path to file containing episode scores
+            samples_per_tier: Number of samples per performance tier
+            
+        Returns:
+            Complete HVA-X analysis results
+        """
+        self.logger.info("Running HVA-X analysis with strategic focus")
+        
+        # Create HVA analyzer instance
+        hva_analyzer = HVAAnalyzer(
+            api_key=self.gemini_client.api_key, 
+            model=self.gemini_client.model
+        )
+        
+        # Run full HVA-X analysis
+        return hva_analyzer.analyze_agent_from_directory(
+            video_dir, score_file, samples_per_tier
+        )
+    
+    def _parse_strategy_analysis(self, analysis_text: str) -> Dict[str, str]:
+        """Parse the analysis text into structured strategic components."""
+        sections = {
+            "overall_strategy": "",
+            "brick_destruction": "",
+            "game_state_management": "",
+            "learning_evolution": "",
+            "performance_effectiveness": "",
+            "summary": ""
+        }
+        
+        # Try to extract sections based on headers
+        current_section = None
+        lines = analysis_text.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Check for section headers
+            if "overall" in line.lower() and "strategy" in line.lower():
+                current_section = "overall_strategy"
+            elif "brick" in line.lower() and "destruction" in line.lower():
+                current_section = "brick_destruction"
+            elif "game state" in line.lower() and "management" in line.lower():
+                current_section = "game_state_management"
+            elif "learning" in line.lower() and ("evolution" in line.lower() or "strategic" in line.lower()):
+                current_section = "learning_evolution"
+            elif "performance" in line.lower() and "effectiveness" in line.lower():
+                current_section = "performance_effectiveness"
+            elif current_section and line:
+                sections[current_section] += line + " "
+        
+        # Extract summary (last 3 sentences or sentences that appear to be summary)
+        summary_lines = []
+        for line in reversed(lines):
+            if line.strip() and ('summary' in line.lower() or 'conclusion' in line.lower() or 
+                              'overall' in line.lower() or len(summary_lines) < 3):
+                summary_lines.append(line.strip())
+                if len(summary_lines) >= 3:
+                    break
+        
+        sections["summary"] = " ".join(reversed(summary_lines))
+        
+        # Clean up sections
+        for key in sections:
+            sections[key] = sections[key].strip()
+        
+        return sections
     
     def _get_timestamp(self) -> str:
         """Get current timestamp as string."""
