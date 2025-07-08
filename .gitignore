@@ -184,7 +184,8 @@ processed_data/
 # VIDEO & MEDIA FILES
 # =============================================================================
 # Video files (can be large)
-*.mp4
+
+hva_videos/*.mp4
 *.avi
 *.mov
 *.mkv
@@ -390,3 +391,23 @@ settings_local.py
 # Keep small test data
 !test_data/
 !sample_data/ 
+hva_videos/episode_001/episode_001.mp4
+hva_videos/episode_002/episode_002.mp4
+hva_videos/episode_003/episode_003.mp4
+hva_videos/episode_004/episode_004.mp4
+hva_videos/episode_005/episode_005.mp4
+hva_videos/episode_006/episode_006.mp4
+hva_videos/episode_007/episode_007.mp4
+hva_videos/episode_008/episode_008.mp4
+hva_videos/episode_009/episode_009.mp4
+hva_videos/episode_010/episode_010.mp4
+hva_videos/episode_011/episode_011.mp4
+hva_videos/episode_012/episode_012.mp4
+hva_videos/episode_013/episode_013.mp4
+hva_videos/episode_014/episode_014.mp4
+hva_videos/episode_015/episode_015.mp4
+hva_videos/episode_016/episode_016.mp4
+hva_videos/episode_017/episode_017.mp4
+hva_videos/episode_018/episode_018.mp4
+hva_videos/episode_019/episode_019.mp4
+hva_videos/episode_020/episode_020.mp4
