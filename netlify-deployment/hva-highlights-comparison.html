@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis Comparison Study - HVA-X vs Highlights</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .language-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .lang-btn {
+            padding: 10px 20px;
+            border: 2px solid #4facfe;
+            background: white;
+            color: #4facfe;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .lang-btn.active {
+            background: #4facfe;
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .phase {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .phase.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .phase-header {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .phase-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .phase-description {
+            font-size: 1.1em;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .video-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .video-player {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .report-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+        }
+
+        .report-content {
+            font-size: 1em;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .report-content h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .report-content h2 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            font-size: 1.4em;
+        }
+
+        .report-content h3 {
+            color: #495057;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+
+        .report-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .report-content li {
+            margin-bottom: 8px;
+        }
+
+        .highlights-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .highlight-item {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .highlight-video {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .highlight-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .evaluation-item {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #4facfe;
+            transition: all 0.3s ease;
+        }
+
+        .evaluation-item:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .dimension-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .statement {
+            font-size: 1.1em;
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .score-selection {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .score-buttons {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .score-btn {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #bdc3c7;
+            background: white;
+            color: #2c3e50;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .score-btn:hover {
+            border-color: #4facfe;
+            background: #e8f4fd;
+            transform: scale(1.1);
+        }
+
+        .score-btn.selected {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+            transform: scale(1.1);
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #7f8c8d;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ecf0f1;
+            color: #7f8c8d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .progress-step.active {
+            background: #4facfe;
+            color: white;
+        }
+
+        .progress-step.completed {
+            background: #27ae60;
+            color: white;
+        }
+
+        .progress-step::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 20px;
+            height: 2px;
+            background: #ecf0f1;
+            transform: translateY(-50%);
+        }
+
+        .progress-step:last-child::after {
+            display: none;
+        }
+
+        .progress-step.completed::after {
+            background: #27ae60;
+        }
+
+        .thank-you {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .thank-you h2 {
+            color: #27ae60;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .thank-you p {
+            font-size: 1.2em;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .randomization-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #27ae60;
+        }
+
+        .randomization-info h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .score-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1em;
+            }
+            
+            .score-buttons {
+                gap: 5px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .highlights-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="main-title">AI Analysis Comparison Study</h1>
+            <p id="subtitle">HVA-X Text Analysis vs Highlights Videos</p>
+        </div>
+
+        <div class="language-toggle">
+            <button class="lang-btn active" onclick="setLanguage('en')" id="en-btn">English</button>
+            <button class="lang-btn" onclick="setLanguage('zh')" id="zh-btn">中文</button>
+        </div>
+
+        <div class="content">
+            <div class="progress-indicator">
+                <div class="progress-step active" id="step-1">1</div>
+                <div class="progress-step" id="step-2">2</div>
+                <div class="progress-step" id="step-3">3</div>
+                <div class="progress-step" id="step-4">4</div>
+            </div>
+
+            <!-- Phase 1: Introduction -->
+            <div class="phase active" id="phase-1">
+                <div class="phase-header">
+                    <h2 class="phase-title" id="intro-title">Welcome & Introduction</h2>
+                    <div class="phase-description" id="intro-description">
+                        <p>Thank you for participating in this research study about understanding AI behavior.</p>
+                        <p>This study will take approximately 15 minutes. Your task is to evaluate two different AI analysis tools to see how effectively they help you understand a game-playing AI.</p>
+                        <p>The experiment will be divided into three stages. Please follow the instructions step by step.</p>
+                    </div>
+                </div>
+                
+                <div class="randomization-info">
+                    <h4 id="randomization-title">Study Design</h4>
+                    <p id="randomization-text">To ensure unbiased results, the order of the two analysis methods will be randomized for each participant.</p>
+                    <p><strong id="your-order">Your randomized order:</strong> <span id="order-display"></span></p>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="nextPhase()" id="start-btn">Start Study</button>
+                </div>
+            </div>
+
+            <!-- Phase 2: Familiarization -->
+            <div class="phase" id="phase-2">
+                <div class="phase-header">
+                    <h2 class="phase-title" id="familiarization-title">Stage 1: Familiarization with Agent Behavior</h2>
+                    <div class="phase-description" id="familiarization-description">
+                        <p>First, you will watch an unedited game video showing a complete performance of an AI playing Breakout.</p>
+                        <p><strong>Your task:</strong> Please watch carefully and try to form an initial impression of this AI's behavioral patterns. This will serve as the baseline for all subsequent evaluations.</p>
+                    </div>
+                </div>
+
+                <div class="video-container">
+                    <video class="video-player" controls id="demo-video">
+                        <source src="videos/demo.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="prevPhase()" id="back-btn">Back</button>
+                    <button class="btn btn-primary" onclick="nextPhase()" id="continue-btn">Continue</button>
+                </div>
+            </div>
+
+            <!-- Phase 3: First Analysis Method -->
+            <div class="phase" id="phase-3">
+                <div class="phase-header">
+                    <h2 class="phase-title" id="first-method-title">Stage 2: Evaluate First Analysis Method</h2>
+                    <div class="phase-description" id="first-method-description">
+                        <!-- Content will be populated based on randomization -->
+                    </div>
+                </div>
+
+                <div id="first-method-content">
+                    <!-- Content will be populated based on randomization -->
+                </div>
+
+                <div id="first-evaluation-form">
+                    <!-- Evaluation form will be generated here -->
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="prevPhase()" id="back-btn-2">Back</button>
+                    <button class="btn btn-primary" onclick="submitFirstEvaluation()" id="submit-first-btn">Submit Evaluation</button>
+                </div>
+            </div>
+
+            <!-- Phase 4: Second Analysis Method -->
+            <div class="phase" id="phase-4">
+                <div class="phase-header">
+                    <h2 class="phase-title" id="second-method-title">Stage 3: Evaluate Second Analysis Method</h2>
+                    <div class="phase-description" id="second-method-description">
+                        <!-- Content will be populated based on randomization -->
+                    </div>
+                </div>
+
+                <div id="second-method-content">
+                    <!-- Content will be populated based on randomization -->
+                </div>
+
+                <div id="second-evaluation-form">
+                    <!-- Evaluation form will be generated here -->
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-secondary" onclick="prevPhase()" id="back-btn-3">Back</button>
+                    <button class="btn btn-primary" onclick="submitSecondEvaluation()" id="submit-second-btn">Submit Evaluation</button>
+                </div>
+            </div>
+
+            <!-- Phase 5: Thank You -->
+            <div class="phase" id="phase-5">
+                <div class="thank-you">
+                    <h2 id="thank-you-title">Thank You!</h2>
+                    <p id="thank-you-message">Thank you for participating in this study. Your responses have been recorded and will help us improve AI explanation systems.</p>
+                    <div class="actions" style="margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="downloadResults()" id="download-btn">Download Results</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentLanguage = 'en';
+        let currentPhase = 1;
+        let randomizedOrder = Math.random() < 0.5 ? 'hva-first' : 'highlights-first';
+        let firstEvaluationData = {};
+        let secondEvaluationData = {};
+
+        const translations = {
+            en: {
+                mainTitle: "AI Analysis Comparison Study",
+                subtitle: "HVA-X Text Analysis vs Highlights Videos",
+                introTitle: "Welcome & Introduction",
+                introDescription: `
+                    <p>Thank you for participating in this research study about understanding AI behavior.</p>
+                    <p>This study will take approximately 15 minutes. Your task is to evaluate two different AI analysis tools to see how effectively they help you understand a game-playing AI.</p>
+                    <p>The experiment will be divided into three stages. Please follow the instructions step by step.</p>
+                `,
+                randomizationTitle: "Study Design",
+                randomizationText: "To ensure unbiased results, the order of the two analysis methods will be randomized for each participant.",
+                yourOrder: "Your randomized order:",
+                startBtn: "Start Study",
+                familiarizationTitle: "Stage 1: Familiarization with Agent Behavior",
+                familiarizationDescription: `
+                    <p>First, you will watch an unedited game video showing a complete performance of an AI playing Breakout.</p>
+                    <p><strong>Your task:</strong> Please watch carefully and try to form an initial impression of this AI's behavioral patterns. This will serve as the baseline for all subsequent evaluations.</p>
+                `,
+                backBtn: "Back",
+                continueBtn: "Continue",
+                submitFirstBtn: "Submit Evaluation",
+                submitSecondBtn: "Submit Evaluation",
+                thankYouTitle: "Thank You!",
+                thankYouMessage: "Thank you for participating in this study. Your responses have been recorded and will help us improve AI explanation systems. Please click the button below to download the results. ",
+                downloadBtn: "Download Results",
+                hvaDescription: `
+                    <p>Next, you will read a text report generated by the HVA-X analysis system. This report aims to provide in-depth analysis of the AI's core strategies, strengths, weaknesses, and behavioral patterns.</p>
+                    <p>After reading, please complete the evaluation questionnaire below based on this text report.</p>
+                `,
+                highlightsDescription: `
+                    <p>Thank you for your feedback. Now, you will watch a collection of key moment videos generated by the HIGHLIGHTS analysis system. These short clips are algorithmically selected from multiple game sessions and are considered the <strong>"most important"</strong> moments.</p>
+                    <p>After watching, please complete the same evaluation questionnaire based on this video collection.</p>
+                `,
+                scaleLabels: {
+                    left: "Strongly Disagree",
+                    right: "Strongly Agree"
+                },
+                items: [
+                    {
+                        dimension: "1. Clarity",
+                        statement: "The current explanation material clearly explains the behavior and decisions of the agent in the demonstration video."
+                    },
+                    {
+                        dimension: "2. Understandable",
+                        statement: "Through this explanation material, I understand how the behavior and decisions of the agent in the demonstration video occurred."
+                    },
+                    {
+                        dimension: "3. Completeness",
+                        statement: "I feel that this explanation material completely covers all aspects of the agent's behavior and decisions in the demonstration video."
+                    },
+                    {
+                        dimension: "4. Satisfaction",
+                        statement: "This explanation material is satisfactory in capturing the behavior and decisions of the agent in the demonstration video."
+                    },
+                    {
+                        dimension: "5. Useful",
+                        statement: "This explanation material is useful for me to understand the behavior and decisions of the agent in the demonstration video."
+                    },
+                    {
+                        dimension: "6. Accuracy",
+                        statement: "The information in this explanation material accurately reflects the behavior and decisions of the agent in the demonstration video."
+                    },
+                    {
+                        dimension: "7. Improvement",
+                        statement: "This explanation material provides additional insights that are not easily noticeable by just watching the demonstration video itself."
+                    },
+                    {
+                        dimension: "8. Preference",
+                        statement: "Rather than just watching the demonstration video, I prefer to obtain information about agent behavior through this kind of explanation material."
+                    }
+                ]
+            },
+            zh: {
+                mainTitle: "AI分析比较研究",
+                subtitle: "HVA-X文本分析 vs 关键时刻视频",
+                introTitle: "欢迎与介绍",
+                introDescription: `
+                    <p>您好，感谢您参与本次关于理解人工智能（AI）行为的研究。</p>
+                    <p>本次研究大约需要15分钟。您的任务是评估两种不同的AI分析工具，看看它们在帮助您理解一个游戏AI方面的效果如何。</p>
+                    <p>实验将分为三个阶段，请您按照指引逐步完成。</p>
+                `,
+                randomizationTitle: "研究设计",
+                randomizationText: "为确保无偏见的结果，两种分析方法的顺序将为每位参与者随机化。",
+                yourOrder: "您的随机顺序：",
+                startBtn: "开始研究",
+                familiarizationTitle: "阶段一：熟悉智能体行为",
+                familiarizationDescription: `
+                    <p>首先，您将观看一段未经剪辑的游戏视频，它展示了一个AI在《打砖块》游戏中的完整表现。</p>
+                    <p><strong>您的任务：</strong>请仔细观看，并尝试在心中形成对这个AI行为模式的初步印象。这是后续所有评估的基准。</p>
+                `,
+                backBtn: "返回",
+                continueBtn: "继续",
+                submitFirstBtn: "提交评估",
+                submitSecondBtn: "提交评估",
+                thankYouTitle: "谢谢！",
+                thankYouMessage: "感谢您参与本次研究。您的回答已被记录，将帮助我们改进AI解释系统。请点击下方按钮下载结果。",
+                downloadBtn: "下载结果",
+                hvaDescription: `
+                    <p>接下来，您将阅读一份由HVA-X分析系统生成的文本报告。这份报告旨在深入分析该AI的核心策略、优缺点及行为模式。</p>
+                    <p>阅读完毕后，请根据这份文本报告，填写下面的评估问卷。</p>
+                `,
+                highlightsDescription: `
+                    <p>感谢您的反馈。现在，您将观看一组由HIGHLIGHTS分析系统生成的关键时刻视频集。这些短片是通过算法从多轮游戏中自动挑选出的、被认为是<strong>"最重要"</strong>的瞬间。</p>
+                    <p>观看完毕后，请根据这组视频集，再次填写同样的评估问卷。</p>
+                `,
+                scaleLabels: {
+                    left: "非常不同意",
+                    right: "非常同意"
+                },
+                items: [
+                    {
+                        dimension: "1. 清晰度 (Clarity)",
+                        statement: "当前这份解释材料清晰地解释了演示视频中智能体的行为和决策。"
+                    },
+                    {
+                        dimension: "2. 可理解性 (Understandable)",
+                        statement: "通过这份解释材料，我理解了演示视频中智能体的行为和决策是如何发生的。"
+                    },
+                    {
+                        dimension: "3. 完整性 (Completeness)",
+                        statement: "我感觉这份解释材料完整地涵盖了演示视频中智能体行为和决策的各个方面。"
+                    },
+                    {
+                        dimension: "4. 满意度 (Satisfaction)",
+                        statement: "这份解释材料在捕捉演示视频中智能体的行为和决策方面，是令人满意的。"
+                    },
+                    {
+                        dimension: "5. 有用性 (Useful)",
+                        statement: "这份解释材料对于我理解演示视频中智能体的行为和决策是有用的。"
+                    },
+                    {
+                        dimension: "6. 准确性 (Accuracy)",
+                        statement: "这份解释材料中的信息准确地反映了演示视频中智能体的行为和决策。"
+                    },
+                    {
+                        dimension: "7. 洞察力提升 (Improvement)",
+                        statement: "这份解释材料提供了额外的、仅靠观看演示视频本身不易察觉的洞察。"
+                    },
+                    {
+                        dimension: "8. 偏好 (Preference)",
+                        statement: "比起仅仅观看演示视频，我更偏好通过这种解释材料来获取关于智能体行为的信息。"
+                    }
+                ]
+            }
+        };
+
+        // HVA-X Report Content
+        const hvaReportContent = {
+            en: `# HVA-X Agent Analysis Report
+
+**Generated:** 2025-07-13T00:07:39.299573  
+**Algorithm:** HVA-X  
+**Phase:** Phase 3 - Meta-Synthesis  
+
+## Analysis Summary
+
+- **Input Analyses:** 6
+- **Failed Analyses:** 0
+- **Synthesis Status:** ✅ Completed
+- **Report Length:** 6,297 characters
+
+### Tier Breakdown
+- **Low Tier:** 2 analyses
+- **Mid Tier:** 2 analyses
+- **High Tier:** 2 analyses
+
+---
+
+## Agent Evaluation Report: Breakout Specialist
+
+### 1. Executive Summary
+
+This agent is a highly specialized "tunneling" expert that consistently employs an optimal, high-risk strategy to clear bricks. Its primary strength lies in its sophisticated, proactive paddle control to set up these game-winning plays. However, this strategic brilliance is critically undermined by poor reactive defense, making it tactically brittle and vulnerable to high-speed balls and sharp-angled returns, leading to highly inconsistent performance outcomes.
+
+### 2. Detailed Strategic Profile
+
+Across all observed performance tiers, the agent demonstrates a singular and sophisticated strategic focus: **tunneling**. Rather than clearing bricks reactively, it proactively attempts to carve a channel on one side of the brick wall. The objective is to send the ball into the space behind the bricks, allowing it to destroy the highest-value upper rows automatically.
+
+*   **High-Risk, High-Reward:** This is an inherently risky strategy that requires playing near the screen edges, minimizing the margin for error. However, when successful, it is the most efficient method for achieving a high score, as evidenced by the rapid point accumulation in mid and high-tier episodes.
+*   **Strategic Consistency:** The agent's commitment to this strategy is its most consistent trait. It is applied at the start of every life, regardless of previous success or failure. This indicates a stable, well-defined policy that has identified the game's optimal long-term solution.
+*   **Adaptation:** The agent shows clear phases in its strategy: (1) **Tunnel Creation**, (2) **Tunnel Exploitation**, and (3) **Cleanup**. It can adapt its target from one side of the screen to the other based on the evolving state of the brick wall, demonstrating a dynamic application of its core strategy.
+
+### 3. Tactical Skill Assessment
+
+The agent exhibits a stark duality in its paddle control, displaying expert proactive skill alongside alarmingly poor reactive skill.
+
+*   **Key Strength (Proactive Angling):** The agent's greatest tactical asset is its ability to use the edges of the paddle to intentionally direct the ball. This advanced, proactive striking is not accidental; it is the fundamental skill that enables its entire tunneling strategy. It consistently demonstrates the ability to set up the precise, repeated shots needed to create a channel.
+
+*   **Key Weakness (Reactive Defense):** The agent's primary point of failure is its inability to defend against the very conditions its own strategy creates. It consistently struggles with:
+    *   **High Ball Velocity:** As the ball clears upper-tier bricks, its speed increases. The agent's reaction time is frequently insufficient to handle this, leading to misses.
+    *   **Sharp-Angle Rebounds:** It has a significant blind spot for predicting the trajectory of balls rebounding sharply off the side walls, a common occurrence when playing a tunneling strategy.
+    *   **Predictive Errors:** In multiple instances across all tiers, the agent misjudges even simple return paths, sometimes moving the paddle in the opposite direction of the ball, indicating a critical flaw in its state interpretation or predictive model under pressure.
+
+### 4. Performance Analysis
+
+The synthesis of multiple analyses reveals that the primary differentiator between performance tiers is not strategic intent, but **tactical execution and resilience**.
+
+*   **Differentiators of Performance:**
+    *   **High-Tier** episodes are defined by flawless execution of the initial tunneling setup. The agent successfully gets the ball behind the brick wall, guaranteeing a high score. Lives are typically lost *after* this phase, due to the resulting high-speed ball.
+    *   **Low-Tier** episodes are characterized by tactical failures *during* the initial setup. The agent makes unforced errors in judgment or reaction time while trying to create the tunnel, leading to an early loss of lives and a low final score.
+    *   **Mid-Tier** episodes represent a middle ground where the agent successfully creates a tunnel but lacks the resilience to manage the subsequent high-difficulty phase, leading to a higher miss rate than top-tier performances.
+
+*   **Failure Modes & Miss Rate:** There is not a direct correlation between the final score and the number of lives lost. Some high-scoring episodes feature 3-4 lost lives. The crucial factor is *when* the lives are lost. A single life lost during the initial setup is more detrimental to the score than three lives lost during the final cleanup phase after the bulk of the bricks have been cleared. The most common failure mode in low-performing episodes is a basic misjudgment of a rebound angle or slow paddle movement during the critical setup phase.
+
+### 5. Conclusion & Recommendations
+
+The agent profiles as a **"glass cannon": strategically brilliant but tactically brittle.** It has mastered the optimal strategy for Breakout but has not developed the fundamental defensive skills required to support it reliably. Its performance is a coin flip between a masterful, efficient run and a quick, clumsy failure, entirely dependent on its ability to execute the first ~15 seconds of its plan without error.
+
+**Recommendations for Improvement:**
+
+1.  **Targeted Defensive Training:** The core tunneling strategy should be preserved. Training should focus exclusively on mitigating the agent's key weakness: reactive defense. A curriculum should be developed that presents the agent with increasingly difficult scenarios involving high-velocity balls and sharp-angled returns from the screen edges.
+2.  **Improve Generalization:** To make the agent more robust, it should be trained in scenarios where tunneling is not immediately viable. This will force it to improve its general-purpose paddle control and trajectory prediction, rather than over-specializing in the setup routine.
+3.  **Failure State Injection:** Intentionally inject game states from which the agent has previously failed (e.g., a fast ball coming from the top-right corner). Repeated training on these specific, known "blind spots" will help patch the most critical holes in its policy.`,
+            zh: `# HVA-X 智能体分析报告
+
+**生成时间:** 2025-07-13T00:07:39.299573  
+**算法:** HVA-X  
+**阶段:** 第三阶段 - 元综合  
+
+## 分析摘要
+
+- **输入分析数量:** 6
+- **失败分析数量:** 0
+- **综合状态:** ✅ 完成
+- **报告长度:** 6,297 字符
+
+### 层级分布
+- **低层级:** 2 个分析
+- **中层级:** 2 个分析
+- **高层级:** 2 个分析
+
+---
+
+## 智能体评估报告：打砖块专家
+
+### 1. 执行摘要
+
+该智能体是一个高度专业化的"隧道"专家，始终采用最优的高风险策略来清除砖块。其主要优势在于复杂的主动挡板控制，能够设置这些制胜策略。然而，这种战略上的出色表现被糟糕的反应性防御严重削弱，使其在战术上脆弱，容易受到高速球和尖锐角度反弹的影响，导致表现结果极不稳定。
+
+### 2. 详细战略分析
+
+在所有观察到的表现层级中，智能体展现出单一而复杂的战略焦点：**隧道策略**。它不是被动地清除砖块，而是主动尝试在砖墙的一侧开凿通道。目标是将球送入砖块后面的空间，让它自动摧毁最高价值的上层砖块。
+
+*   **高风险高回报:** 这是一个本质上风险很高的策略，需要在屏幕边缘附近操作，最小化出错的余地。然而，当成功时，这是获得高分最有效的方法，正如中高层级剧集中快速积分所证明的那样。
+*   **战略一致性:** 智能体对这一策略的坚持是其最一致的特征。无论之前成功还是失败，它都会在每个生命开始时应用这个策略。这表明有一个稳定、明确的策略，已经识别出游戏的最优长期解决方案。
+*   **适应性:** 智能体在其策略中显示出明确的阶段：(1) **隧道创建**，(2) **隧道利用**，和 (3) **清理**。它可以根据砖墙的演变状态将目标从屏幕的一侧调整到另一侧，展现出其核心策略的动态应用。
+
+### 3. 战术技能评估
+
+智能体在挡板控制方面表现出鲜明的二元性，展现出专家级的主动技能，同时伴随着令人担忧的糟糕反应技能。
+
+*   **关键优势（主动角度控制）:** 智能体最大的战术资产是其使用挡板边缘有意引导球的能力。这种先进的主动击球不是偶然的；它是支撑整个隧道策略的基本技能。它始终展现出设置创建通道所需的精确、重复击球的能力。
+
+*   **关键弱点（反应性防御）:** 智能体的主要失败点是无法防御其自身策略创造的条件。它在以下方面始终表现困难：
+    *   **高球速度:** 当球清除上层砖块时，其速度会增加。智能体的反应时间经常不足以处理这种情况，导致失误。
+    *   **尖锐角度反弹:** 它在预测从侧墙尖锐反弹的球的轨迹方面有显著盲点，这在使用隧道策略时是常见现象。
+    *   **预测错误:** 在所有层级的多个实例中，智能体甚至对简单的返回路径都判断错误，有时会将挡板移动到球的相反方向，表明在压力下其状态解释或预测模型存在关键缺陷。
+
+### 4. 表现分析
+
+多个分析的综合揭示，表现层级之间的主要区别不是战略意图，而是**战术执行和韧性**。
+
+*   **表现差异因素:**
+    *   **高层级**剧集的特点是完美执行初始隧道设置。智能体成功地将球送到砖墙后面，保证了高分。生命通常在这个阶段*之后*失去，由于由此产生的高速球。
+    *   **低层级**剧集的特点是在初始设置*期间*的战术失败。智能体在尝试创建隧道时在判断或反应时间上犯不受迫错误，导致生命早期损失和低最终分数。
+    *   **中层级**剧集代表中间地带，智能体成功创建隧道但缺乏管理后续高难度阶段的韧性，导致比顶级表现更高的失误率。
+
+*   **失败模式和失误率:** 最终分数和失去的生命数量之间没有直接相关性。一些高分剧集有3-4个失去的生命。关键因素是生命*何时*失去。在初始设置期间失去的一个生命比在大部分砖块被清除后的最终清理阶段失去的三个生命对分数更有害。低表现剧集中最常见的失败模式是在关键设置阶段对反弹角度的基本误判或挡板移动缓慢。
+
+### 5. 结论与建议
+
+该智能体的特征是**"玻璃大炮"：战略上出色但战术上脆弱。** 它掌握了打砖块的最优策略，但没有发展出可靠支持它所需的基本防御技能。其表现是在大师级高效运行和快速笨拙失败之间的抛硬币，完全取决于其在计划的前约15秒内无错误执行的能力。
+
+**改进建议:**
+
+1.  **针对性防御训练:** 应保留核心隧道策略。训练应专注于缓解智能体的关键弱点：反应性防御。应开发一个课程，向智能体呈现涉及高速球和来自屏幕边缘的尖锐角度返回的越来越困难的场景。
+2.  **改善泛化能力:** 为了使智能体更加稳健，应在隧道不立即可行的场景中训练它。这将迫使它改善通用挡板控制和轨迹预测，而不是过度专门化设置例程。
+3.  **失败状态注入:** 有意注入智能体之前失败的游戏状态（例如，来自右上角的快球）。对这些特定的已知"盲点"的重复训练将有助于修补其策略中最关键的漏洞。`
+        };
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(lang + '-btn').classList.add('active');
+            updateContent();
+        }
+
+        function updateContent() {
+            const t = translations[currentLanguage];
+            
+            // Update main titles
+            document.getElementById('main-title').textContent = t.mainTitle;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            
+            // Update phase 1 content
+            document.getElementById('intro-title').textContent = t.introTitle;
+            document.getElementById('intro-description').innerHTML = t.introDescription;
+            document.getElementById('randomization-title').textContent = t.randomizationTitle;
+            document.getElementById('randomization-text').textContent = t.randomizationText;
+            document.getElementById('your-order').textContent = t.yourOrder;
+            document.getElementById('start-btn').textContent = t.startBtn;
+            
+            // Update phase 2 content
+            document.getElementById('familiarization-title').textContent = t.familiarizationTitle;
+            document.getElementById('familiarization-description').innerHTML = t.familiarizationDescription;
+            document.getElementById('back-btn').textContent = t.backBtn;
+            document.getElementById('continue-btn').textContent = t.continueBtn;
+            
+            // Update other buttons
+            document.getElementById('back-btn-2').textContent = t.backBtn;
+            document.getElementById('submit-first-btn').textContent = t.submitFirstBtn;
+            document.getElementById('back-btn-3').textContent = t.backBtn;
+            document.getElementById('submit-second-btn').textContent = t.submitSecondBtn;
+            
+            // Update thank you page
+            document.getElementById('thank-you-title').textContent = t.thankYouTitle;
+            document.getElementById('thank-you-message').textContent = t.thankYouMessage;
+            document.getElementById('download-btn').textContent = t.downloadBtn;
+            
+            // Update order display
+            updateOrderDisplay();
+            
+            // Update phase 3 and 4 content based on randomization
+            updatePhaseContent();
+        }
+
+        function updateOrderDisplay() {
+            const orderText = randomizedOrder === 'hva-first' ? 
+                (currentLanguage === 'en' ? 'HVA-X Text Report → Highlights Videos' : 'HVA-X文本报告 → 关键时刻视频') :
+                (currentLanguage === 'en' ? 'Highlights Videos → HVA-X Text Report' : '关键时刻视频 → HVA-X文本报告');
+            
+            document.getElementById('order-display').textContent = orderText;
+        }
+
+        function updatePhaseContent() {
+            const t = translations[currentLanguage];
+            
+            if (randomizedOrder === 'hva-first') {
+                // First method: HVA-X, Second method: Highlights
+                document.getElementById('first-method-title').textContent = currentLanguage === 'en' ? 'Stage 2: Evaluate First Analysis Method (Text Report)' : '阶段二：评估第一份解释材料（文本报告）';
+                document.getElementById('first-method-description').innerHTML = t.hvaDescription;
+                document.getElementById('first-method-content').innerHTML = `
+                    <div class="report-container">
+                        <div class="report-content">${hvaReportContent[currentLanguage].replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')}</div>
+                    </div>
+                `;
+                
+                document.getElementById('second-method-title').textContent = currentLanguage === 'en' ? 'Stage 3: Evaluate Second Analysis Method (Video Collection)' : '阶段三：评估第二份解释材料（视频集）';
+                document.getElementById('second-method-description').innerHTML = t.highlightsDescription;
+                document.getElementById('second-method-content').innerHTML = generateHighlightsContent();
+            } else {
+                // First method: Highlights, Second method: HVA-X
+                document.getElementById('first-method-title').textContent = currentLanguage === 'en' ? 'Stage 2: Evaluate First Analysis Method (Video Collection)' : '阶段二：评估第一份解释材料（视频集）';
+                document.getElementById('first-method-description').innerHTML = t.highlightsDescription;
+                document.getElementById('first-method-content').innerHTML = generateHighlightsContent();
+                
+                document.getElementById('second-method-title').textContent = currentLanguage === 'en' ? 'Stage 3: Evaluate Second Analysis Method (Text Report)' : '阶段三：评估第二份解释材料（文本报告）';
+                document.getElementById('second-method-description').innerHTML = t.hvaDescription;
+                document.getElementById('second-method-content').innerHTML = `
+                    <div class="report-container">
+                        <div class="report-content">${hvaReportContent[currentLanguage].replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function generateHighlightsContent() {
+            return `
+                <div class="highlights-container">
+                    <div class="highlight-item">
+                        <video class="highlight-video" controls>
+                            <source src="videos/HL_0.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="highlight-title">${currentLanguage === 'en' ? 'Highlight 1' : '关键时刻 1'}</div>
+                    </div>
+                    <div class="highlight-item">
+                        <video class="highlight-video" controls>
+                            <source src="videos/HL_1.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="highlight-title">${currentLanguage === 'en' ? 'Highlight 2' : '关键时刻 2'}</div>
+                    </div>
+                    <div class="highlight-item">
+                        <video class="highlight-video" controls>
+                            <source src="videos/HL_2.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="highlight-title">${currentLanguage === 'en' ? 'Highlight 3' : '关键时刻 3'}</div>
+                    </div>
+                    <div class="highlight-item">
+                        <video class="highlight-video" controls>
+                            <source src="videos/HL_3.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="highlight-title">${currentLanguage === 'en' ? 'Highlight 4' : '关键时刻 4'}</div>
+                    </div>
+                    <div class="highlight-item">
+                        <video class="highlight-video" controls>
+                            <source src="videos/HL_4.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="highlight-title">${currentLanguage === 'en' ? 'Highlight 5' : '关键时刻 5'}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateEvaluationForm(containerId, evaluationData) {
+            const t = translations[currentLanguage];
+            const container = document.getElementById(containerId);
+            
+            container.innerHTML = '';
+            
+            t.items.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'evaluation-item';
+                itemDiv.innerHTML = `
+                    <div class="dimension-title">${item.dimension}</div>
+                    <div class="statement">${item.statement}</div>
+                    <div class="score-selection">
+                        <div style="width: 100%;">
+                            <div class="scale-labels">
+                                <span>${t.scaleLabels.left}</span>
+                                <span>${t.scaleLabels.right}</span>
+                            </div>
+                            <div class="score-buttons">
+                                ${[1,2,3,4,5,6,7].map(score => `
+                                    <button class="score-btn" onclick="selectScore('${containerId}', ${index}, ${score})" data-container="${containerId}" data-item="${index}" data-score="${score}">
+                                        ${score}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+            
+            // Restore selected scores
+            Object.keys(evaluationData).forEach(itemIndex => {
+                const score = evaluationData[itemIndex];
+                const btn = document.querySelector(`[data-container="${containerId}"][data-item="${itemIndex}"][data-score="${score}"]`);
+                if (btn) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+
+        function selectScore(containerId, itemIndex, score) {
+            // Remove previous selection for this item
+            document.querySelectorAll(`[data-container="${containerId}"][data-item="${itemIndex}"]`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Add selection to clicked button
+            document.querySelector(`[data-container="${containerId}"][data-item="${itemIndex}"][data-score="${score}"]`).classList.add('selected');
+            
+            // Store the score
+            if (containerId === 'first-evaluation-form') {
+                firstEvaluationData[itemIndex] = score;
+            } else {
+                secondEvaluationData[itemIndex] = score;
+            }
+        }
+
+        function nextPhase() {
+            if (currentPhase < 5) {
+                document.getElementById(`phase-${currentPhase}`).classList.remove('active');
+                currentPhase++;
+                document.getElementById(`phase-${currentPhase}`).classList.add('active');
+                updateProgressIndicator();
+                
+                // Generate evaluation forms when entering phase 3 or 4
+                if (currentPhase === 3) {
+                    generateEvaluationForm('first-evaluation-form', firstEvaluationData);
+                } else if (currentPhase === 4) {
+                    generateEvaluationForm('second-evaluation-form', secondEvaluationData);
+                }
+            }
+        }
+
+        function prevPhase() {
+            if (currentPhase > 1) {
+                document.getElementById(`phase-${currentPhase}`).classList.remove('active');
+                currentPhase--;
+                document.getElementById(`phase-${currentPhase}`).classList.add('active');
+                updateProgressIndicator();
+            }
+        }
+
+        function updateProgressIndicator() {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step-${i}`);
+                step.classList.remove('active', 'completed');
+                
+                if (i < currentPhase) {
+                    step.classList.add('completed');
+                } else if (i === currentPhase) {
+                    step.classList.add('active');
+                }
+            }
+        }
+
+        function submitFirstEvaluation() {
+            const t = translations[currentLanguage];
+            const totalItems = t.items.length;
+            const completedItems = Object.keys(firstEvaluationData).length;
+            
+            if (completedItems < totalItems) {
+                alert(currentLanguage === 'en' ? 
+                    `Please complete all ${totalItems} evaluations. You have completed ${completedItems}/${totalItems}.` :
+                    `请完成所有 ${totalItems} 项评估。您已完成 ${completedItems}/${totalItems} 项。`);
+                return;
+            }
+            
+            nextPhase();
+        }
+
+        function submitSecondEvaluation() {
+            const t = translations[currentLanguage];
+            const totalItems = t.items.length;
+            const completedItems = Object.keys(secondEvaluationData).length;
+            
+            if (completedItems < totalItems) {
+                alert(currentLanguage === 'en' ? 
+                    `Please complete all ${totalItems} evaluations. You have completed ${completedItems}/${totalItems}.` :
+                    `请完成所有 ${totalItems} 项评估。您已完成 ${completedItems}/${totalItems} 项。`);
+                return;
+            }
+            
+            nextPhase();
+        }
+
+        function downloadResults() {
+            // Always use English headers for CSV to avoid encoding issues
+            let csvContent = 'Method,Dimension,Score\n';
+            
+            const firstMethodName = randomizedOrder === 'hva-first' ? 'HVA-X' : 'Highlights';
+            const secondMethodName = randomizedOrder === 'hva-first' ? 'Highlights' : 'HVA-X';
+            
+            // Simplified dimension names in English only
+            const dimensionNames = [
+                'Clarity',
+                'Understandable', 
+                'Completeness',
+                'Satisfaction',
+                'Useful',
+                'Accuracy',
+                'Improvement',
+                'Preference'
+            ];
+            
+            // Add first evaluation data
+            dimensionNames.forEach((dimension, index) => {
+                const score = firstEvaluationData[index];
+                csvContent += `${firstMethodName},${dimension},${score}\n`;
+            });
+            
+            // Add second evaluation data
+            dimensionNames.forEach((dimension, index) => {
+                const score = secondEvaluationData[index];
+                csvContent += `${secondMethodName},${dimension},${score}\n`;
+            });
+            
+            // Add metadata
+            csvContent += `\nMetadata\n`;
+            csvContent += `Language,${currentLanguage}\n`;
+            csvContent += `Order,${randomizedOrder}\n`;
+            csvContent += `Timestamp,${new Date().toISOString()}\n`;
+            
+            const fileName = `hva_highlights_${currentLanguage}_${randomizedOrder}_${new Date().toISOString().split('T')[0]}.csv`;
+            
+            // Download CSV locally
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Try to upload to Google Drive
+            uploadToGoogleDrive(csvContent, fileName);
+            
+            alert(currentLanguage === 'en' ? 
+                'Results downloaded successfully! Saving to server...' :
+                '结果下载成功！正在保存到服务器...');
+        }
+
+        function uploadToGoogleDrive(csvContent, fileName) {
+            // Upload to local server
+            fetch('/upload-csv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    csvContent: csvContent,
+                    fileName: fileName
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Successfully saved results:', data.filename);
+                    alert(currentLanguage === 'en' ? 
+                        `Results saved successfully as ${data.filename}!` :
+                        `结果已成功保存为 ${data.filename}！`);
+                } else {
+                    console.log('Failed to save results:', data.error);
+                    showManualUploadInstructions(fileName);
+                }
+            })
+            .catch(error => {
+                console.log('Error saving results:', error);
+                showManualUploadInstructions(fileName);
+            });
+        }
+
+        function showManualUploadInstructions(fileName) {
+            const instructions = currentLanguage === 'en' ? 
+                `Results saved locally as "${fileName}". The file has been downloaded to your computer.` :
+                `结果已本地保存为"${fileName}"。文件已下载到您的计算机。`;
+            
+            alert(instructions);
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateContent();
+            updateProgressIndicator();
+        });
+    </script>
+</body>
+</html> 

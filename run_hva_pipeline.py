@@ -20,7 +20,7 @@ sys.path.append(str(Path(__file__).parent / "src"))
 from run_phase1_only import run_phase1_only, save_phase1_results
 from run_phase2a_only import run_phase2a_only, save_phase2a_results
 from run_phase2b_only import run_phase2b_only, save_phase2b_results
-from run_phase3_only import run_phase3_only, save_phase3_results, save_final_report
+from run_phase3_only import run_phase3_only, save_phase3_results, save_final_report as save_final_report_func
 
 
 def run_hva_pipeline(
@@ -176,7 +176,7 @@ def run_hva_pipeline(
         # Save final report
         final_report_file = f"{output_prefix}_final_report_{timestamp}.md"
         if save_final_report:
-            save_final_report(phase3_results, final_report_file)
+            save_final_report_func(phase3_results, final_report_file)
             pipeline_results["pipeline_info"]["final_files"].append(final_report_file)
         
         pipeline_results["pipeline_info"]["final_files"].append(phase3_file)
@@ -344,7 +344,7 @@ Examples:
         """
     )
     
-    parser.add_argument("--video-dir", type=str,
+    parser.add_argument("--video-dir", type=str,default="hva_videos",
                        help="Directory containing video files")
     parser.add_argument("--score-file", type=str,
                        help="Path to scores.txt file")

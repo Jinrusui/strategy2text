@@ -64,22 +64,22 @@ class GeminiClient:
     def _get_event_detection_prompt(self) -> str:
         """Get the event detection prompt for Phase 2a of HVA-X."""
         return """
-You are an AI assistant analyzing a Breakout RL agent's gameplay video for key strategic moments.
+You are an AI assistant analyzing a Breakout RL agent's gameplay video for key moments.
 
-Your task is to identify and timestamp the most important strategic events in this video. Focus on:
+Your task is to identify and timestamp the most important strategic and tactical events. Focus on:
 
-1. **Critical Decision Points**: Moments where the agent makes important strategic choices
-2. **Tactical Errors**: Significant mistakes or missed opportunities
-3. **Strategy Changes**: Points where the agent adapts or changes approach
-4. **Key Successes**: Moments of particularly effective play or strategic wins
-5. **Game State Transitions**: Important changes in game dynamics or brick patterns
+1.  **Critical Decision Points**: Moments where the agent makes important strategic choices
+2.  **Tactical Errors & Misses**: Significant mistakes, missed opportunities, or clear failures in ball tracking.
+3.  **Strategy Changes**: Points where the agent adapts or changes its brick-clearing approach
+4.  **Key Successes & Skilled Shots**: Moments of effective play or shots indicating advanced ball control.
+5.  **Game State Transitions**: Important changes in game dynamics (e.g., ball speed increase).
 
 **OUTPUT FORMAT**: Return ONLY a JSON list of events with this exact structure:
 [
   {
     "timestamp": "MM:SS-MM:SS",
     "event": "Brief description of what happens",
-    "type": "critical_decision|tactical_error|strategy_change|key_success|game_transition"
+    "type": "critical_decision|tactical_error|strategy_change|key_success|game_transition|skilled_shot"
   }
 ]
 
@@ -87,104 +87,83 @@ Your task is to identify and timestamp the most important strategic events in th
 - Provide timestamps in MM:SS-MM:SS format (e.g., "0:15-0:20")
 - Keep event descriptions concise (1-2 sentences max)
 - Include 5-10 most important events only
-- Focus on strategic significance, not routine gameplay
 - Return valid JSON format only - no additional text or explanations
 """
     
     def _get_guided_analysis_prompt(self) -> str:
         """Get the guided analysis prompt template for Phase 2b of HVA-X."""
         return """
-You are an expert RL analyst conducting a comprehensive strategic analysis of a Breakout agent's gameplay.
+You are an expert RL analyst conducting a comprehensive analysis of a Breakout agent's gameplay.
 
 **KEY MOMENTS FOR FOCUSED ANALYSIS:**
 {key_events}
 
-Using the key moments above as focal points, provide a detailed strategic analysis covering:
+Using the key moments above as focal points, provide a detailed analysis covering the framework below.
 
-## Strategic Analysis Framework
+## Strategic & Tactical Analysis Framework
 
-### 1. Overall Strategy & Approach
-- Long-term game plan and strategic thinking
-- Risk vs reward decision making patterns
-- Adaptation to different game phases
-- Strategic positioning and forward planning
+### 1. Overall Brick-Clearing Strategy
+- Describe the agent's primary method for clearing bricks (e.g., tunneling, side-clearing, random).
+- Analyze its risk management profile (e.g., plays conservatively in the center vs. takes risks at the edges).
+- Note any adaptation in strategy as the brick pattern changes.
 
-### 2. Strategic Execution Analysis
-- How well the agent executes its intended strategy
-- Consistency of strategic choices across similar situations
-- Evidence of strategic learning and adaptation
-- Quality of strategic decision-making under pressure
+### 2. Paddle Control & Ball Striking Technique
+- **Responsiveness:** How quickly and accurately does the agent react to the ball's speed and trajectory? Note any visible lag or overcorrection.
+- **Striking Method:** Does the agent simply position itself under the ball, or does it show evidence of using the paddle's edges to intentionally control the ball's angle?
+- **Positioning:** Describe its default paddle position and movement patterns during play.
 
-### 3. Performance-Critical Moments
-- Analysis of the key moments identified above
-- How these moments reflect the agent's strategic capabilities
-- What these moments reveal about strengths and weaknesses
-- Strategic implications of successes and failures
+### 3. Performance Consistency & Failure Analysis
+- **Consistency:** How does the agent's performance change across different lives in the video? Is it consistent, or does its skill degrade?
+- **Failure Points:** Analyze the agent's misses. Does it fail predictably in certain situations (e.g., high-speed balls, sharp angles)? Use the 'tactical_error' events as evidence.
 
-### 4. Tactical Competence
-- Precision and effectiveness of tactical execution
-- Ball control and paddle positioning strategies
-- Brick-breaking efficiency and pattern recognition
-- Response to changing game dynamics
+### 4. Quantitative Performance Summary (Estimate if necessary)
+- **Overall Score:** State the final score of the episode.
+- **Miss Rate:** How many lives were lost?
+- **Brick Clearing Efficiency:** Comment on how effectively it cleared bricks relative to the time played.
 
-### 5. Strategic Weaknesses & Strengths
-- Primary strategic advantages demonstrated
-- Key strategic limitations or blind spots
-- Comparison to optimal strategic approaches
-- Areas for strategic improvement
+### 5. Summary of Strengths & Weaknesses
+- Based on the above, what are the agent's primary strategic strengths and tactical limitations?
 
-**CONCLUSION**: End with a 3-sentence summary capturing the agent's strategic profile, its primary strategic approach, and overall strategic effectiveness.
-
-Focus on STRATEGIC intelligence rather than moment-to-moment actions. Use the key moments to illustrate broader strategic patterns and capabilities.
+**CONCLUSION**: End with a 3-sentence summary capturing the agent's strategic profile, its key paddle skill, and its overall effectiveness.
 """
     
     def _get_meta_synthesis_prompt(self) -> str:
         """Get the meta-synthesis prompt for Phase 3 of HVA-X."""
         return """
-You are a lead RL analyst synthesizing multiple video analyses to create a comprehensive agent evaluation report.
+You are a lead RL analyst synthesizing multiple gameplay analyses to create a comprehensive agent evaluation report.
 
 **ANALYSIS DATA:**
 {all_summaries}
 
-Your task is to synthesize these individual analyses into a cohesive, high-level report that identifies:
+Your task is to synthesize these individual analyses into a cohesive, high-level report.
 
 ## Synthesis Framework
 
-### 1. Performance Patterns Across Tiers
-- How does the agent's strategic approach differ between high, medium, and low-performing episodes?
-- What strategic elements correlate with successful vs unsuccessful outcomes?
-- Are there consistent strategic patterns within each performance tier?
+### 1. Differentiators of Performance
+- What specific strategies, paddle techniques, or behaviors separate high-scoring episodes from low-scoring ones?
+- Is there a correlation between quantitative metrics (like miss rate) and the final score tier?
+- What are the most common failure modes observed in the low-performing episodes?
 
-### 2. Strategic Competence Profile
-- What is the agent's core strategic approach to Breakout?
-- Which strategic elements does the agent execute well consistently?
-- What strategic limitations appear across multiple episodes?
+### 2. Agent Competence Profile
+- **Core Strategy:** What is the agent's most common brick-clearing strategy across all episodes?
+- **Tactical Skill:** What is the agent's general level of paddle skill? Does it consistently demonstrate advanced techniques like angle control, or does it primarily play reactively?
+- **Key Strengths:** What are its most reliable strengths (e.g., consistent defense, effective tunneling)?
+- **Key Weaknesses:** What are its most common weaknesses (e.g., handling high speeds, sharp-angle shots)?
 
-### 3. Learning & Adaptation Evidence
-- Does the agent show evidence of strategic learning or adaptation?
-- Are there strategic capabilities that emerge in higher-performing episodes?
-- What does the variation in performance tell us about the agent's strategic flexibility?
-
-### 4. Critical Success & Failure Factors
-- What strategic factors most strongly predict episode success?
-- What are the common failure modes that lead to poor performance?
-- How does the agent handle strategic pressure and critical moments?
-
-### 5. Overall Strategic Assessment
-- How would you characterize this agent's strategic intelligence?
-- What are its primary strategic strengths and weaknesses?
-- How does it compare to what you'd expect from an expert Breakout player?
+### 3. Overall Consistency & Reliability
+- How consistent is the agent's performance across the entire sample set?
+- Does the agent's skill (e.g., paddle control, responsiveness) appear uniform, or does it vary significantly between games?
 
 ## Final Report Format
 
 Provide a comprehensive report structured as:
-1. **Executive Summary** (2-3 sentences)
-2. **Strategic Profile** (detailed analysis using the framework above)
-3. **Performance Analysis** (patterns across tiers)
-4. **Recommendations** (areas for improvement)
-5. **Conclusion** (overall assessment)
+1.  **Executive Summary** (A 3-sentence overview of the agent's profile, skill, and consistency).
+2.  **Detailed Strategic Profile** (Analysis of its core strategies and decision-making).
+3.  **Tactical Skill Assessment** (Evaluation of its paddle control, responsiveness, and striking techniques).
+4.  **Performance Analysis** (Patterns and key differentiators across performance tiers).
+5.  **Conclusion & Recommendations** (Overall assessment and potential areas for improvement).
 
-Focus on strategic-level insights that can only be gained by analyzing multiple episodes across different performance levels.
+Focus on insights that emerge from comparing multiple episodes. Contrast the different performance tiers to build a complete picture of the agent's capabilities.
 """
 
     def _wait_for_file_active(self, uploaded_file: Any, max_wait_time: int = 120) -> None:

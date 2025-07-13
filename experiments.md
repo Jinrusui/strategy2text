@@ -1,0 +1,2 @@
+experiments motivation:
+1. core hypothesis: text strategy summarization is better than video based summarizarion, which more easy to understand, more coverable, and easy to evaluation ability of agent.

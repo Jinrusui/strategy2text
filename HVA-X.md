@@ -1,7 +1,3 @@
-Here's the final version of the algorithm, structured as a technical document for implementation.
-
------
-
 ## **Algorithm: Multi-Pass Video Analysis for RL Agent Summarization**
 
 ### **1. Objective**

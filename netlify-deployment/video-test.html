@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .video-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>视频测试页面 - Video Test Page</h1>
+    
+    <div class="video-section">
+        <h2>Demo Video</h2>
+        <video controls id="demo-video">
+            <source src="videos/demo.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="status" id="demo-status">Loading...</div>
+    </div>
+    
+    <div class="video-section">
+        <h2>Grad-CAM Video</h2>
+        <video controls id="gradcam-video">
+            <source src="videos/gradcam_video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="status" id="gradcam-status">Loading...</div>
+    </div>
+    
+    <div class="video-section">
+        <h2>Highlight Videos</h2>
+        <div id="highlight-videos">
+            <!-- Highlight videos will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Test video loading
+        function testVideo(videoId, statusId, videoName) {
+            const video = document.getElementById(videoId);
+            const status = document.getElementById(statusId);
+            
+            video.addEventListener('loadeddata', function() {
+                status.innerHTML = `✅ ${videoName} loaded successfully (Duration: ${video.duration.toFixed(2)}s)`;
+                status.className = 'status success';
+            });
+            
+            video.addEventListener('error', function() {
+                status.innerHTML = `❌ ${videoName} failed to load`;
+                status.className = 'status error';
+            });
+            
+            video.addEventListener('canplay', function() {
+                console.log(`${videoName} can play`);
+            });
+        }
+        
+        // Test demo and gradcam videos
+        testVideo('demo-video', 'demo-status', 'Demo Video');
+        testVideo('gradcam-video', 'gradcam-status', 'Grad-CAM Video');
+        
+        // Create highlight videos
+        const highlightContainer = document.getElementById('highlight-videos');
+        for (let i = 0; i < 5; i++) {
+            const section = document.createElement('div');
+            section.style.marginBottom = '20px';
+            
+            const title = document.createElement('h3');
+            title.textContent = `Highlight Video ${i}`;
+            
+            const video = document.createElement('video');
+            video.controls = true;
+            video.id = `hl-${i}`;
+            video.style.width = '100%';
+            video.style.maxWidth = '400px';
+            
+            const source = document.createElement('source');
+            source.src = `videos/HL_${i}.mp4`;
+            source.type = 'video/mp4';
+            
+            video.appendChild(source);
+            video.appendChild(document.createTextNode('Your browser does not support the video tag.'));
+            
+            const status = document.createElement('div');
+            status.className = 'status';
+            status.id = `hl-${i}-status`;
+            status.textContent = 'Loading...';
+            
+            section.appendChild(title);
+            section.appendChild(video);
+            section.appendChild(status);
+            
+            highlightContainer.appendChild(section);
+            
+            // Test this highlight video
+            testVideo(`hl-${i}`, `hl-${i}-status`, `Highlight Video ${i}`);
+        }
+        
+        // Overall test summary
+        setTimeout(() => {
+            const allStatuses = document.querySelectorAll('.status');
+            let successCount = 0;
+            let errorCount = 0;
+            
+            allStatuses.forEach(status => {
+                if (status.className.includes('success')) {
+                    successCount++;
+                } else if (status.className.includes('error')) {
+                    errorCount++;
+                }
+            });
+            
+            console.log(`Video test results: ${successCount} success, ${errorCount} errors`);
+            
+            // Add summary to page
+            const summary = document.createElement('div');
+            summary.style.marginTop = '30px';
+            summary.style.padding = '20px';
+            summary.style.borderRadius = '8px';
+            summary.style.fontWeight = 'bold';
+            
+            if (errorCount === 0) {
+                summary.style.backgroundColor = '#d4edda';
+                summary.style.color = '#155724';
+                summary.innerHTML = `🎉 All videos loaded successfully! (${successCount}/${allStatuses.length})`;
+            } else {
+                summary.style.backgroundColor = '#f8d7da';
+                summary.style.color = '#721c24';
+                summary.innerHTML = `⚠️ ${errorCount} videos failed to load. ${successCount} videos working.`;
+            }
+            
+            document.body.appendChild(summary);
+        }, 3000);
+    </script>
+</body>
+</html> 
