@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HVA-X Research Study</title>
+    <title>AI Analysis Comparison Study</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -12,76 +12,128 @@
             padding: 40px 20px;
             line-height: 1.6;
             color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
         .container {
             text-align: center;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
         h1 {
             color: #2c3e50;
             margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
         }
-        .study-links {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 40px 0;
-        }
-        .study-link {
+        .start-button {
             display: inline-block;
-            padding: 15px 30px;
-            background: #3498db;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: background 0.3s;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            margin: 30px 0;
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .study-link:hover {
-            background: #2980b9;
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
         .info {
             background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 15px;
             margin: 30px 0;
+            border-left: 5px solid #4facfe;
+        }
+        .randomization-info {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #27ae60;
+        }
+        .randomization-info h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
         }
         .footer {
             margin-top: 50px;
             font-size: 14px;
             color: #666;
         }
+        .loading {
+            display: none;
+            margin: 20px 0;
+            color: #4facfe;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>HVA-X Research Study</h1>
+        <h1>AI Analysis Comparison Study</h1>
         
         <div class="info">
-            <p>Welcome to our research study comparing different AI explanation methods.</p>
-            <p>Please click on one of the study links below to participate.</p>
+            <p><strong>Welcome!</strong> Thank you for participating in our research study about understanding AI behavior.</p>
+            <p>This study compares different AI analysis methods to see how effectively they help you understand a game-playing AI.</p>
         </div>
         
-        <div class="study-links">
-            <a href="hva-highlights-comparison.html" class="study-link">
-                HVA-X vs Highlights Study
-            </a>
-            <a href="hva-gradcam-comparison.html" class="study-link">
-                HVA-X vs Grad-CAM Study
-            </a>
+        <div class="randomization-info">
+            <h4>Randomized Study Design</h4>
+            <p>To ensure unbiased results, you will be randomly assigned to one of two study conditions. Both studies take approximately 15 minutes to complete.</p>
+        </div>
+        
+        <button class="start-button" onclick="startRandomizedStudy()" id="start-btn">
+            Start Study
+        </button>
+        
+        <div class="loading" id="loading">
+            <p>Randomly assigning study condition...</p>
         </div>
         
         <div class="info">
             <p><strong>Instructions:</strong></p>
-            <p>• Each study takes approximately 15-20 minutes to complete</p>
             <p>• Please use a desktop or laptop computer for the best experience</p>
             <p>• Make sure your audio is enabled for the video content</p>
-            <p>• You can participate in both studies if you wish</p>
+            <p>• You can pause, replay or adjust play speed while watching videos</p>
+            <p>• Focus on understanding the AI's behavior and strategy</p>
         </div>
         
         <div class="footer">
             <p>Thank you for participating in our research!</p>
         </div>
     </div>
+
+    <script>
+        function startRandomizedStudy() {
+            // Show loading message
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('start-btn').style.display = 'none';
+            
+            // Randomly assign to one of two studies
+            const randomValue = Math.random();
+            let targetPage;
+            
+            if (randomValue < 0.5) {
+                targetPage = 'hva-highlights-comparison.html';
+            } else {
+                targetPage = 'hva-gradcam-comparison.html';
+            }
+            
+            // Add a small delay for better user experience
+            setTimeout(() => {
+                window.location.href = targetPage;
+            }, 1000);
+        }
+    </script>
 </body>
 </html>

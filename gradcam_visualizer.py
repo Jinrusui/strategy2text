@@ -363,7 +363,7 @@ class AtariGradCAMVisualizer:
         
         # For video creation
         if save_video:
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+            fourcc = cv2.VideoWriter_fourcc(*'h264')
             video_writer = cv2.VideoWriter(
                 os.path.join(save_dir, f'gradcam_episode_{method}.mp4'),
                 fourcc, 10.0, (640, 480)
@@ -500,7 +500,7 @@ def main():
                        help='Algorithm name')
     parser.add_argument('--device', type=str, default='auto',
                        help='Device to use (auto, cpu, cuda)')
-    parser.add_argument('--n-steps', type=int, default=100,
+    parser.add_argument('--n-steps', type=int, default=4500,
                        help='Number of steps to visualize')
     parser.add_argument('--output-dir', type=str, default='gradcam_output',
                        help='Output directory for visualizations')

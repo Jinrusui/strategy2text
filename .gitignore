@@ -412,3 +412,6 @@ hva_videos/episode_018/episode_018.mp4
 hva_videos/episode_019/episode_019.mp4
 hva_videos/episode_020/episode_020.mp4
 demo_video.mp4
+gradcam_videos/gradcam_video.mp4
+.gitignore
+gradcam_videos2/gradcam_BreakoutNoFrameskip-v4_dqn.mp4

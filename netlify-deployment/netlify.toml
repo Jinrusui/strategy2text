@@ -1,0 +1,27 @@
+[build]
+  publish = "."
+  command = "echo 'No build command needed'"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Forms configuration
+[forms]
+  # Enable form detection (this can also be done in the UI)
+  # Forms with data-netlify="true" will be automatically detected
+
+# HTTP headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' data:; connect-src 'self';"
+
+# Custom 404 page
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 404 

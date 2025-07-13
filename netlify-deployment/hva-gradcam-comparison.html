@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Analysis Comparison Study - HVA-X vs Grad-CAM</title>
     <style>
+        /* Add new game-intro styles */
+        .game-intro {
+            background: #e8f4ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .game-intro h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .game-intro ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .game-intro li {
+            margin-bottom: 8px;
+        }
+        
+        /* Keep existing styles */
         * {
             margin: 0;
             padding: 0;
@@ -456,6 +480,7 @@
                     <h2 class="phase-title" id="familiarization-title">Stage 1: Familiarization with Agent Behavior</h2>
                     <div class="phase-description" id="familiarization-description">
                         <p>First, you will watch an unedited game video showing a complete performance of an AI playing Breakout.</p>
+                        <p><strong>Viewing Tips: If you find the video content too fast, you can pause, rewind, or adjust the playback speed to better understand the AI's behavior.</strong></p>
                         <p><strong>Your task:</strong> Please watch carefully and try to form an initial impression of this AI's behavioral patterns. This will serve as the baseline for all subsequent evaluations.</p>
                     </div>
                 </div>
@@ -532,6 +557,34 @@
         </div>
     </div>
 
+    <!-- Hidden form for Netlify form detection -->
+    <form name="study-results" method="POST" data-netlify="true" style="display: none;">
+        <input type="hidden" name="form-name" value="study-results" />
+        <input type="hidden" name="study-type" />
+        <input type="hidden" name="first-method" />
+        <input type="hidden" name="second-method" />
+        <input type="hidden" name="language" />
+        <input type="hidden" name="order" />
+        <input type="hidden" name="timestamp" />
+        <input type="hidden" name="first-clarity" />
+        <input type="hidden" name="first-understandable" />
+        <input type="hidden" name="first-completeness" />
+        <input type="hidden" name="first-satisfaction" />
+        <input type="hidden" name="first-useful" />
+        <input type="hidden" name="first-accuracy" />
+        <input type="hidden" name="first-improvement" />
+        <input type="hidden" name="first-preference" />
+        <input type="hidden" name="second-clarity" />
+        <input type="hidden" name="second-understandable" />
+        <input type="hidden" name="second-completeness" />
+        <input type="hidden" name="second-satisfaction" />
+        <input type="hidden" name="second-useful" />
+        <input type="hidden" name="second-accuracy" />
+        <input type="hidden" name="second-improvement" />
+        <input type="hidden" name="second-preference" />
+        <input type="hidden" name="results-json" />
+    </form>
+
     <script>
         let currentLanguage = 'en';
         let currentPhase = 1;
@@ -545,9 +598,24 @@
                 subtitle: "HVA-X Text Analysis vs Grad-CAM Visualization",
                 introTitle: "Welcome & Introduction",
                 introDescription: `
-                    <p>Thank you for participating in this research study about understanding AI behavior.</p>
-                    <p>This study will take approximately 15 minutes. Your task is to evaluate two different AI analysis tools to see how effectively they help you understand a game-playing AI.</p>
-                    <p>The experiment will be divided into three stages. Please follow the instructions step by step.</p>
+                    <p><strong>Welcome!</strong> This study is about <strong>understanding and analyzing the strategy of a game-playing AI agent</strong>. All videos, reports, and methods you will see are designed to help you achieve this goal. <br><span style="color:#4facfe;">If you feel confused or unsure, please don't doubt yourself—sometimes the AI's behavior is hard to interpret, and that's a limitation of the algorithm, not you!</span></p>
+                    <p>This study will take about 15 minutes. Your main task is to use two different AI analysis tools to help you understand <strong>how the agent plays and what strategies it uses</strong>. Please focus on forming your own understanding of the agent's behavior and strategy, using all materials as aids.</p>
+                    <p><strong>What will you see?</strong> You will first watch a full unedited gameplay video of the agent. Then, you will experience two different AI analysis methods (for example, a text report and a visualization), with the order randomized. Each method is designed to help you analyze and summarize the agent’s behavior and strategy.</p>
+                    <div class="game-intro">
+                        <h3>About Breakout Game</h3>
+                        <p>In this study, the AI plays the classic arcade game <strong>Breakout</strong>:</p>
+                        <ul>
+                            <li><strong>Basic Control:</strong> The player controls a paddle at the bottom of the screen</li>
+                            <li><strong>Objective:</strong> A ball bounces around the screen, breaking bricks at the top</li>
+                            <li><strong>Goal:</strong> Clear all bricks without letting the ball fall below the paddle</li>
+                            <li><strong>Lives:</strong> The player starts with multiple lives (usually 5), losing one each time the ball falls below the paddle</li>
+                            <li><strong>Speed Changes:</strong> The ball speed increases as more bricks are destroyed, making the game progressively harder</li>
+                            <li><strong>Scoring:</strong> Different colored brick rows have different point values - higher rows (closer to top) are worth more points</li>
+                            <li><strong>Score Display:</strong> The numbers on the screen show the current score and remaining lives</li>
+                            <li><strong>Strategy:</strong> Advanced players often try to create a "tunnel" through one side to get the ball behind the brick wall for maximum efficiency</li>
+                        </ul>
+                    </div>
+                    <p><strong>Remember:</strong> The goal is to analyze and understand the agent's strategy. If you find any part hard to interpret, that's normal—just do your best!</p>
                 `,
                 randomizationTitle: "Study Design",
                 randomizationText: "To ensure unbiased results, the order of the two analysis methods will be randomized for each participant.",
@@ -556,7 +624,8 @@
                 familiarizationTitle: "Stage 1: Familiarization with Agent Behavior",
                 familiarizationDescription: `
                     <p>First, you will watch an unedited game video showing a complete performance of an AI playing Breakout.</p>
-                    <p><strong>Your task:</strong> Please watch carefully and try to form an initial impression of this AI's behavioral patterns. This will serve as the baseline for all subsequent evaluations.</p>
+                    <p><strong>Tips:</strong> If you find the video too fast, feel free to pause, rewind, or adjust the speed. Focus on observing the agent's actions and try to spot any patterns or strategies.</p>
+                    <p><strong>Your task:</strong> Try to form your own understanding of how the agent plays and what strategies it uses. This is the foundation for all later analysis. <br><span style="color:#4facfe;">Don't worry if you feel unsure—just describe what you see!</span></p>
                 `,
                 backBtn: "Back",
                 continueBtn: "Continue",
@@ -566,15 +635,18 @@
                 thankYouMessage: "Thank you for participating in this study. Your responses have been recorded and will help us improve AI explanation systems. Please click the button below to download the results.",
                 downloadBtn: "Download Results",
                 hvaDescription: `
-                    <p>Next, you will read a text report generated by the HVA-X analysis system. This report aims to provide in-depth analysis of the AI's core strategies, strengths, weaknesses, and behavioral patterns.</p>
-                    <p>After reading, please complete the evaluation questionnaire below based on this text report.</p>
+                    <div style="margin-bottom: 1em;"><strong>What is HVA-X?</strong><br>HVA-X is an AI analysis tool that generates a <strong>text report</strong> summarizing the agent’s strategies, strengths, weaknesses, and behavioral patterns. This report is the <strong>result of an algorithm</strong> trying to explain the agent's behavior in human language. <span style="color:#4facfe;">If you find the explanation unclear or hard to relate to the video, that's a limitation of the method, not your fault.</span></div>
+                    <p>Read the report below and focus on how it helps (or doesn't help) you understand the agent's strategy. After reading, please answer the questions based on your own understanding.</p>
+                    <div style="color:#4facfe;margin-top:10px;"><strong>Please do your best to use the provided materials/results to analyze and summarize the agent’s behavior and strategy.</strong></div>
                 `,
                 gradcamDescription: `
-                    <p>Thank you for your feedback. Now, you will watch a Grad-CAM visualization video generated by the visual attention analysis system. This video shows the AI's visual attention patterns during gameplay, highlighting which parts of the game screen the AI focuses on when making decisions.</p>
-                    <p>After watching, please complete the same evaluation questionnaire based on this visualization.</p>
+                    <div style="margin-bottom: 1em;"><strong>What is Grad-CAM?</strong><br>Grad-CAM is an <strong>analysis tool</strong> that uses visualization to show which areas of the game screen the agent “pays attention to” when making decisions. The video you see is the <strong>result of this method</strong>—not just a random overlay, but what the algorithm thinks are key areas for understanding the agent's strategy. <span style="color:#4facfe;">If you find the visualization hard to interpret, that's a limitation of the method, not your fault.</span></div>
+                    <p>Watch the Grad-CAM video below and focus on what it reveals about the agent's behavior and strategy. <strong>If you find the content too fast, pause, rewind, or adjust the speed as needed.</strong></p>
+                    <p>After watching, please answer the questions based on your own understanding. <span style="color:#4facfe;">If you feel confused, that's normal—just do your best!</span></p>
+                    <div style="color:#4facfe;margin-top:10px;"><strong>Please do your best to use the provided materials/results to analyze and summarize the agent’s behavior and strategy.</strong></div>
                 `,
-                gradcamExplanation: "What is Grad-CAM?",
-                gradcamExplanationText: "Grad-CAM (Gradient-weighted Class Activation Mapping) is a visualization technique that shows which parts of the input image are most important for the AI's decision-making. The colored overlays indicate areas of high attention, with warmer colors (red/yellow) representing higher importance.",
+                gradcamExplanation: "Understanding Grad-CAM",
+                gradcamExplanationText: "Grad-CAM (Gradient-weighted Class Activation Mapping) is a visualization technique that highlights the areas in the game screen that most influence the AI's decisions. Warmer colors (red/yellow) indicate higher importance, showing where the AI 'looks' when making gameplay choices.",
                 scaleLabels: {
                     left: "Strongly Disagree",
                     right: "Strongly Agree"
@@ -582,35 +654,35 @@
                 items: [
                     {
                         dimension: "1. Clarity",
-                        statement: "The current explanation material clearly explains the behavior and decisions of the agent in the demonstration video."
+                        statement: "This method/result clearly describes the agent's behavior and decisions."
                     },
                     {
-                        dimension: "2. Understandable",
-                        statement: "Through this explanation material, I understand how the behavior and decisions of the agent in the demonstration video occurred."
+                        dimension: "2. Understandability",
+                        statement: "I can understand how the agent made its decisions based on this method/result."
                     },
                     {
                         dimension: "3. Completeness",
-                        statement: "I feel that this explanation material completely covers all aspects of the agent's behavior and decisions in the demonstration video."
+                        statement: "This method/result covers all important aspects of the agent's behavior."
                     },
                     {
                         dimension: "4. Satisfaction",
-                        statement: "This explanation material is satisfactory in capturing the behavior and decisions of the agent in the demonstration video."
+                        statement: "I'm satisfied with how well this method/result helps me understand the agent's behavior."
                     },
                     {
-                        dimension: "5. Useful",
-                        statement: "This explanation material is useful for me to understand the behavior and decisions of the agent in the demonstration video."
+                        dimension: "5. Usefulness",
+                        statement: "This method/result is useful for understanding the agent's gameplay and strategy."
                     },
                     {
                         dimension: "6. Accuracy",
-                        statement: "The information in this explanation material accurately reflects the behavior and decisions of the agent in the demonstration video."
+                        statement: "The information accurately reflects the agent's actual behavior."
                     },
                     {
-                        dimension: "7. Improvement",
-                        statement: "This explanation material provides additional insights that are not easily noticeable by just watching the demonstration video itself."
+                        dimension: "7. Insightfulness",
+                        statement: "This method/result reveals insights not obvious from just watching the full gameplay."
                     },
                     {
-                        dimension: "8. Preference",
-                        statement: "Rather than just watching the demonstration video, I prefer to obtain information about agent behavior through this kind of explanation material."
+                        dimension: "8. Confidence",
+                        statement: "I feel confident in my own understanding after using this method/result."
                     }
                 ]
             },
@@ -619,9 +691,24 @@
                 subtitle: "HVA-X文本分析 vs Grad-CAM可视化",
                 introTitle: "欢迎与介绍",
                 introDescription: `
-                    <p>您好，感谢您参与本次关于理解人工智能（AI）行为的研究。</p>
-                    <p>本次研究大约需要15分钟。您的任务是评估两种不同的AI分析工具，看看它们在帮助您理解一个游戏AI方面的效果如何。</p>
-                    <p>实验将分为三个阶段，请您按照指引逐步完成。</p>
+                    <p><strong>欢迎！</strong> 本研究的核心目标是<strong>理解和分析游戏AI智能体的策略表现</strong>。所有视频、报告和方法，都是为了帮助您完成这个目标。<br><span style="color:#4facfe;">如果您觉得难以理解，请不要怀疑自己——有时AI的行为本身就很难解释，这属于算法的局限，而不是您的问题！</span></p>
+                    <p>本次研究大约需要15分钟。您的主要任务是利用两种不同的AI分析工具，帮助自己理解<strong>智能体是如何玩游戏、采用了什么策略</strong>。请始终以“分析智能体策略”为目标，所有材料都是辅助工具。</p>
+                    <p><strong>您将看到哪些材料？</strong> 您将首先观看一段智能体完整的原始游戏视频。随后，您会依次体验两种不同的AI分析方法（如文本报告和可视化），顺序为随机分配。每种材料都旨在帮助您分析和总结智能体的行为与策略。</p>
+                    <div class="game-intro">
+                        <h3>关于打砖块游戏</h3>
+                        <p>在本研究中，AI玩的是经典街机游戏<strong>打砖块（Breakout）</strong>：</p>
+                        <ul>
+                            <li><strong>基本操作：</strong>玩家控制屏幕底部的挡板</li>
+                            <li><strong>游戏机制：</strong>球在屏幕上弹跳，击碎顶部的砖块</li>
+                            <li><strong>游戏目标：</strong>清除所有砖块，同时防止球掉到挡板下方</li>
+                            <li><strong>生命系统：</strong>玩家开始时有多条生命（通常为5条），每次球掉到挡板下方会失去一条生命</li>
+                            <li><strong>速度变化：</strong>随着更多砖块被摧毁，球的速度会增加，使游戏逐渐变难</li>
+                            <li><strong>计分系统：</strong>不同颜色的砖块行有不同的分值——越高的行（越接近顶部）分值越高</li>
+                            <li><strong>分数显示：</strong>屏幕上的数字显示当前分数和剩余生命数</li>
+                            <li><strong>高级策略：</strong>高级玩家通常尝试在一侧创建“通道”，让球进入砖墙后方以获得最大效率</li>
+                        </ul>
+                    </div>
+                    <p><strong>请记住：</strong>目标是分析和理解智能体的策略。如果觉得难以解释很正常——请尽力描述您的理解即可！</p>
                 `,
                 randomizationTitle: "研究设计",
                 randomizationText: "为确保无偏见的结果，两种分析方法的顺序将为每位参与者随机化。",
@@ -629,8 +716,9 @@
                 startBtn: "开始研究",
                 familiarizationTitle: "阶段一：熟悉智能体行为",
                 familiarizationDescription: `
-                    <p>首先，您将观看一段未经剪辑的游戏视频，它展示了一个AI在《打砖块》游戏中的完整表现。</p>
-                    <p><strong>您的任务：</strong>请仔细观看，并尝试在心中形成对这个AI行为模式的初步印象。这是后续所有评估的基准。</p>
+                    <p>首先，您将观看一段未经剪辑的游戏视频，完整展示AI的游戏过程。</p>
+                    <p><strong>提示：如果觉得视频过快，可以暂停、重播或调整速度。</strong>请关注智能体的行为，尝试发现其策略或规律。</p>
+                    <p><strong>您的任务：</strong>请尽量形成自己对智能体策略和行为的理解，这将作为后续分析的基础。<br><span style="color:#4facfe;">如果觉得难以理解很正常——请如实描述您的观察！</span></p>
                 `,
                 backBtn: "返回",
                 continueBtn: "继续",
@@ -640,15 +728,18 @@
                 thankYouMessage: "感谢您参与本次研究。您的回答已被记录，将帮助我们改进AI解释系统。请点击下方按钮下载结果。",
                 downloadBtn: "下载结果",
                 hvaDescription: `
-                    <p>接下来，您将阅读一份由HVA-X分析系统生成的文本报告。这份报告旨在深入分析该AI的核心策略、优缺点及行为模式。</p>
-                    <p>阅读完毕后，请根据这份文本报告，填写下面的评估问卷。</p>
+                    <div style="margin-bottom: 1em;"><strong>什么是 HVA-X？</strong><br>HVA-X 是一种AI分析工具，会生成一份<strong>文本报告</strong>，总结智能体的策略、优缺点和行为模式。该报告是算法试图用人类语言解释智能体行为的<strong>方法结果</strong>。<span style="color:#4facfe;">如果您觉得报告难以理解或与视频不符，这属于方法本身的局限，而不是您的问题。</span></div>
+                    <p>请阅读下方报告，关注它是否帮助您理解智能体的策略。阅读后请根据您的真实感受回答问题。</p>
+                    <div style="color:#4facfe;margin-top:10px;"><strong>请尽力尝试通过这些材料/结果辅助分析和总结智能体的行为与策略。</strong></div>
                 `,
                 gradcamDescription: `
-                    <p>感谢您的反馈。现在，您将观看一个由视觉注意力分析系统生成的Grad-CAM可视化视频。这个视频显示了AI在游戏过程中的视觉注意力模式，突出显示AI在做决策时关注游戏屏幕的哪些部分。</p>
-                    <p>观看完毕后，请根据这个可视化视频，再次填写同样的评估问卷。</p>
+                    <div style="margin-bottom: 1em;"><strong>什么是 Grad-CAM？</strong><br>Grad-CAM 是一种<strong>分析工具</strong>，通过可视化展示智能体在决策时“关注”游戏画面的哪些区域。您看到的视频是<strong>方法的结果</strong>，不是随意叠加，而是算法认为有助于理解智能体策略的关键区域。<span style="color:#4facfe;">如果您觉得可视化难以理解，这属于方法本身的局限，而不是您的问题。</span></div>
+                    <p>请观看下方Grad-CAM视频，关注它揭示了哪些智能体的行为和策略。<strong>提示：如果觉得内容过快，可暂停、重播或调整速度。</strong></p>
+                    <p>观看后请根据您的真实理解回答问题。<span style="color:#4facfe;">如果觉得难以理解很正常——请如实作答！</span></p>
+                    <div style="color:#4facfe;margin-top:10px;"><strong>请尽力尝试通过这些材料/结果辅助分析和总结智能体的行为与策略。</strong></div>
                 `,
-                gradcamExplanation: "什么是Grad-CAM？",
-                gradcamExplanationText: "Grad-CAM（梯度加权类激活映射）是一种可视化技术，显示输入图像的哪些部分对AI的决策最重要。彩色覆盖层表示高注意力区域，暖色（红色/黄色）代表更高的重要性。",
+                gradcamExplanation: "理解Grad-CAM",
+                gradcamExplanationText: "Grad-CAM（梯度加权类激活映射）是一种可视化技术，突显游戏屏幕中对AI决策影响最大的区域。暖色（红色/黄色）表示更高的重要性，展示AI在做出游戏决策时'关注'的位置。",
                 scaleLabels: {
                     left: "非常不同意",
                     right: "非常同意"
@@ -656,35 +747,35 @@
                 items: [
                     {
                         dimension: "1. 清晰度 (Clarity)",
-                        statement: "当前这份解释材料清晰地解释了演示视频中智能体的行为和决策。"
+                        statement: "该方法/结果清晰地描述了智能体的行为和决策过程。"
                     },
                     {
-                        dimension: "2. 可理解性 (Understandable)",
-                        statement: "通过这份解释材料，我理解了演示视频中智能体的行为和决策是如何发生的。"
+                        dimension: "2. 可理解性 (Understandability)",
+                        statement: "基于此方法/结果，我能理解智能体是如何做出决策的。"
                     },
                     {
                         dimension: "3. 完整性 (Completeness)",
-                        statement: "我感觉这份解释材料完整地涵盖了演示视频中智能体行为和决策的各个方面。"
+                        statement: "该方法/结果涵盖了智能体行为的所有重要方面。"
                     },
                     {
                         dimension: "4. 满意度 (Satisfaction)",
-                        statement: "这份解释材料在捕捉演示视频中智能体的行为和决策方面，是令人满意的。"
+                        statement: "我对该方法/结果帮助我理解智能体行为的程度感到满意。"
                     },
                     {
-                        dimension: "5. 有用性 (Useful)",
-                        statement: "这份解释材料对于我理解演示视频中智能体的行为和决策是有用的。"
+                        dimension: "5. 有用性 (Usefulness)",
+                        statement: "该方法/结果对理解智能体的游戏策略很有帮助。"
                     },
                     {
                         dimension: "6. 准确性 (Accuracy)",
-                        statement: "这份解释材料中的信息准确地反映了演示视频中智能体的行为和决策。"
+                        statement: "方法/结果中的信息准确反映了智能体的实际行为。"
                     },
                     {
-                        dimension: "7. 洞察力提升 (Improvement)",
-                        statement: "这份解释材料提供了额外的、仅靠观看演示视频本身不易察觉的洞察。"
+                        dimension: "7. 洞察力 (Insightfulness)",
+                        statement: "该方法/结果揭示了仅靠观看完整游戏难以察觉的洞察。"
                     },
                     {
-                        dimension: "8. 偏好 (Preference)",
-                        statement: "比起仅仅观看演示视频，我更偏好通过这种解释材料来获取关于智能体行为的信息。"
+                        dimension: "8. 信心 (Confidence)",
+                        statement: "使用该方法/结果后，我对自己的理解更有信心。"
                     }
                 ]
             }
@@ -692,26 +783,7 @@
 
         // HVA-X Report Content (same as in highlights comparison)
         const hvaReportContent = {
-            en: `# HVA-X Agent Analysis Report
-
-**Generated:** 2025-07-13T00:07:39.299573  
-**Algorithm:** HVA-X  
-**Phase:** Phase 3 - Meta-Synthesis  
-
-## Analysis Summary
-
-- **Input Analyses:** 6
-- **Failed Analyses:** 0
-- **Synthesis Status:** ✅ Completed
-- **Report Length:** 6,297 characters
-
-### Tier Breakdown
-- **Low Tier:** 2 analyses
-- **Mid Tier:** 2 analyses
-- **High Tier:** 2 analyses
-
----
-
+            en: `
 ## Agent Evaluation Report: Breakout Specialist
 
 ### 1. Executive Summary
@@ -757,71 +829,53 @@ The agent profiles as a **"glass cannon": strategically brilliant but tactically
 1.  **Targeted Defensive Training:** The core tunneling strategy should be preserved. Training should focus exclusively on mitigating the agent's key weakness: reactive defense. A curriculum should be developed that presents the agent with increasingly difficult scenarios involving high-velocity balls and sharp-angled returns from the screen edges.
 2.  **Improve Generalization:** To make the agent more robust, it should be trained in scenarios where tunneling is not immediately viable. This will force it to improve its general-purpose paddle control and trajectory prediction, rather than over-specializing in the setup routine.
 3.  **Failure State Injection:** Intentionally inject game states from which the agent has previously failed (e.g., a fast ball coming from the top-right corner). Repeated training on these specific, known "blind spots" will help patch the most critical holes in its policy.`,
-            zh: `# HVA-X 智能体分析报告
-
-**生成时间:** 2025-07-13T00:07:39.299573  
-**算法:** HVA-X  
-**阶段:** 第三阶段 - 元综合  
-
-## 分析摘要
-
-- **输入分析数量:** 6
-- **失败分析数量:** 0
-- **综合状态:** ✅ 完成
-- **报告长度:** 6,297 字符
-
-### 层级分布
-- **低层级:** 2 个分析
-- **中层级:** 2 个分析
-- **高层级:** 2 个分析
-
----
-
-## 智能体评估报告：打砖块专家
+            zh: `
+## 智能体评估报告：Breakout 专家型智能体
 
 ### 1. 执行摘要
 
-该智能体是一个高度专业化的"隧道"专家，始终采用最优的高风险策略来清除砖块。其主要优势在于复杂的主动挡板控制，能够设置这些制胜策略。然而，这种战略上的出色表现被糟糕的反应性防御严重削弱，使其在战术上脆弱，容易受到高速球和尖锐角度反弹的影响，导致表现结果极不稳定。
+该智能体是一名高度专业化的“打通通道”专家，始终如一地采用高风险、高回报的策略清除砖块。其主要优势在于对球拍的前瞻性控制能力，能够精确地设置出获胜路径。但这种战略天赋严重受限于其糟糕的反应性防御，使其在面对高速球和急角反弹时表现脆弱，导致整体表现极其不稳定。
 
-### 2. 详细战略分析
+### 2. 战略细节画像
 
-在所有观察到的表现层级中，智能体展现出单一而复杂的战略焦点：**隧道策略**。它不是被动地清除砖块，而是主动尝试在砖墙的一侧开凿通道。目标是将球送入砖块后面的空间，让它自动摧毁最高价值的上层砖块。
+在所有表现层级中，该智能体展现出一致且精细的战略重点：**打通通道（Tunneling）**。它并非被动地清除面前的砖块，而是主动尝试在一侧打出一条通道，目的是让球进入砖墙后方，从而自动清除上层高分砖块。
 
-*   **高风险高回报:** 这是一个本质上风险很高的策略，需要在屏幕边缘附近操作，最小化出错的余地。然而，当成功时，这是获得高分最有效的方法，正如中高层级剧集中快速积分所证明的那样。
-*   **战略一致性:** 智能体对这一策略的坚持是其最一致的特征。无论之前成功还是失败，它都会在每个生命开始时应用这个策略。这表明有一个稳定、明确的策略，已经识别出游戏的最优长期解决方案。
-*   **适应性:** 智能体在其策略中显示出明确的阶段：(1) **隧道创建**，(2) **隧道利用**，和 (3) **清理**。它可以根据砖墙的演变状态将目标从屏幕的一侧调整到另一侧，展现出其核心策略的动态应用。
+* \*\*高风险高回报：\*\*这是一种本质上具有高风险的策略，需在屏幕边缘附近操作，失误容忍度极低。但若成功，它是得分最高效的方式，这在中高层级的回合中已被高分证实。
+* \*\*战略一致性：\*\*无论前一局成功与否，该策略始终在每条生命开始时被采用。这表明其策略稳定、明确，已找到游戏的最优长远解法。
+* \*\*策略适应性：\*\*智能体在策略上表现出明显的三个阶段：（1）**通道构建**，（2）**通道利用**，（3）**残余清除**。它能根据砖墙状态从屏幕一侧切换至另一侧，展现出其核心策略的动态应用能力。
 
 ### 3. 战术技能评估
 
-智能体在挡板控制方面表现出鲜明的二元性，展现出专家级的主动技能，同时伴随着令人担忧的糟糕反应技能。
+该智能体在球拍控制方面表现出明显的二元性：具备卓越的主动技能，却严重缺乏反应性防御能力。
 
-*   **关键优势（主动角度控制）:** 智能体最大的战术资产是其使用挡板边缘有意引导球的能力。这种先进的主动击球不是偶然的；它是支撑整个隧道策略的基本技能。它始终展现出设置创建通道所需的精确、重复击球的能力。
+* \*\*关键优势（主动角度控制）：\*\*智能体最大的战术优势在于利用球拍边缘有意识地控制球的方向。这种高级主动击球技巧并非偶然，而是其通道策略得以成立的基础。它多次展现出设置精准、重复打击的能力。
+* \*\*关键劣势（反应性防御）：\*\*智能体的主要失败点是无法防守自己策略带来的后果，表现为：
 
-*   **关键弱点（反应性防御）:** 智能体的主要失败点是无法防御其自身策略创造的条件。它在以下方面始终表现困难：
-    *   **高球速度:** 当球清除上层砖块时，其速度会增加。智能体的反应时间经常不足以处理这种情况，导致失误。
-    *   **尖锐角度反弹:** 它在预测从侧墙尖锐反弹的球的轨迹方面有显著盲点，这在使用隧道策略时是常见现象。
-    *   **预测错误:** 在所有层级的多个实例中，智能体甚至对简单的返回路径都判断错误，有时会将挡板移动到球的相反方向，表明在压力下其状态解释或预测模型存在关键缺陷。
+  * \*\*高速球处理能力差：\*\*当球清除上层砖块后速度上升，智能体往往反应不及，频繁漏接；
+  * \*\*急角反弹预测失败：\*\*面对来自侧墙的急角反弹球轨迹，它常常判断失误，形成明显盲点；
+  * \*\*预测性错误：\*\*在多层级案例中，甚至面对简单回弹路径，智能体也会判断错误，有时甚至将球拍移向相反方向，反映其状态理解或预测模型在高压情境下存在严重缺陷。
 
 ### 4. 表现分析
 
-多个分析的综合揭示，表现层级之间的主要区别不是战略意图，而是**战术执行和韧性**。
+多个分析的综合显示，**表现层级间的主要差异不在于战略意图，而在于战术执行力和抗压能力。**
 
-*   **表现差异因素:**
-    *   **高层级**剧集的特点是完美执行初始隧道设置。智能体成功地将球送到砖墙后面，保证了高分。生命通常在这个阶段*之后*失去，由于由此产生的高速球。
-    *   **低层级**剧集的特点是在初始设置*期间*的战术失败。智能体在尝试创建隧道时在判断或反应时间上犯不受迫错误，导致生命早期损失和低最终分数。
-    *   **中层级**剧集代表中间地带，智能体成功创建隧道但缺乏管理后续高难度阶段的韧性，导致比顶级表现更高的失误率。
+* **表现层级关键差异：**
 
-*   **失败模式和失误率:** 最终分数和失去的生命数量之间没有直接相关性。一些高分剧集有3-4个失去的生命。关键因素是生命*何时*失去。在初始设置期间失去的一个生命比在大部分砖块被清除后的最终清理阶段失去的三个生命对分数更有害。低表现剧集中最常见的失败模式是在关键设置阶段对反弹角度的基本误判或挡板移动缓慢。
+  * \*\*高表现等级：\*\*通道构建阶段执行无误，成功让球进入砖块后方，保证高分。丢命多数发生在高难度阶段之后。
+  * \*\*低表现等级：\*\*在通道构建阶段即发生战术失误，如判断失误或反应不及时，导致早期失误和低分结局。
+  * \*\*中等表现等级：\*\*成功打通通道，但后续高难度阶段缺乏稳定性，漏球率较高，得分居中。
 
-### 5. 结论与建议
+* **失败模式与丢命分析：**最终得分与丢命数量无直接相关性。部分高分局中，智能体丢掉 3-4 条生命。关键在于**丢命发生的时机**：若在初始通道构建阶段丢命，对得分影响最大；而若在最后清理阶段丢命，即便多条，也影响较小。低表现主要因开局阶段处理失误，如反弹角度判断错误或球拍移动迟缓。
 
-该智能体的特征是**"玻璃大炮"：战略上出色但战术上脆弱。** 它掌握了打砖块的最优策略，但没有发展出可靠支持它所需的基本防御技能。其表现是在大师级高效运行和快速笨拙失败之间的抛硬币，完全取决于其在计划的前约15秒内无错误执行的能力。
+### 5. 结论与改进建议
 
-**改进建议:**
+该智能体属于\*\*“玻璃大炮”型角色：战略天赋极高，但战术极度脆弱。\*\*它已经掌握了Breakout游戏的最优策略，但尚未具备支撑该策略所需的基本防守能力。其表现极不稳定，在“精彩高分”与“快速失败”之间摇摆不定，完全取决于前 15 秒内是否能成功完成策略初始阶段。
 
-1.  **针对性防御训练:** 应保留核心隧道策略。训练应专注于缓解智能体的关键弱点：反应性防御。应开发一个课程，向智能体呈现涉及高速球和来自屏幕边缘的尖锐角度返回的越来越困难的场景。
-2.  **改善泛化能力:** 为了使智能体更加稳健，应在隧道不立即可行的场景中训练它。这将迫使它改善通用挡板控制和轨迹预测，而不是过度专门化设置例程。
-3.  **失败状态注入:** 有意注入智能体之前失败的游戏状态（例如，来自右上角的快球）。对这些特定的已知"盲点"的重复训练将有助于修补其策略中最关键的漏洞。`
+**改进建议：**
+
+1. \*\*专注防守训练：\*\*保留其通道策略，在此基础上开展强化防守训练。构建训练课程，专门呈现高速度球和屏幕边缘急角反弹等复杂场景，提升其反应能力。
+2. \*\*提升泛化能力：\*\*在训练中加入通道策略不可行的场景，迫使其改进一般性球拍控制与轨迹预测，避免过度依赖特定起手套路。
+3. \*\*失败状态注入：\*\*从历史失败案例中提取关键失败状态（如：高速球自右上角来袭），进行集中训练，有针对性地弥补策略漏洞。`
         };
 
         function setLanguage(lang) {
@@ -1052,10 +1106,60 @@ The agent profiles as a **"glass cannon": strategically brilliant but tactically
             nextPhase();
         }
 
-        function downloadResults() {
-            // Always use English headers for CSV to avoid encoding issues
-            let csvContent = 'Method,Dimension,Score\n';
+        function submitToNetlify(firstEvaluationResult, secondEvaluationResult, results, timestamp) {
+            // Get the hidden form
+            const form = document.querySelector('form[name="study-results"]');
             
+            // Populate form fields
+            form.querySelector('[name="study-type"]').value = 'hva-gradcam';
+            form.querySelector('[name="first-method"]').value = firstEvaluationResult.method;
+            form.querySelector('[name="second-method"]').value = secondEvaluationResult.method;
+            form.querySelector('[name="language"]').value = currentLanguage;
+            form.querySelector('[name="order"]').value = randomizedOrder;
+            form.querySelector('[name="timestamp"]').value = timestamp;
+            form.querySelector('[name="results-json"]').value = JSON.stringify(results, null, 2);
+            
+            // Populate first evaluation scores
+            const dimensionNames = ['Clarity', 'Understandable', 'Completeness', 'Satisfaction', 'Useful', 'Accuracy', 'Improvement', 'Preference'];
+            dimensionNames.forEach((dimension, index) => {
+                const fieldName = `first-${dimension.toLowerCase()}`;
+                const fieldElement = form.querySelector(`[name="${fieldName}"]`);
+                if (fieldElement) {
+                    fieldElement.value = firstEvaluationResult.evaluations[dimension] || '';
+                }
+            });
+            
+            // Populate second evaluation scores
+            dimensionNames.forEach((dimension, index) => {
+                const fieldName = `second-${dimension.toLowerCase()}`;
+                const fieldElement = form.querySelector(`[name="${fieldName}"]`);
+                if (fieldElement) {
+                    fieldElement.value = secondEvaluationResult.evaluations[dimension] || '';
+                }
+            });
+            
+            // Submit form via AJAX
+            const formData = new FormData(form);
+            
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            })
+            .then(() => {
+                alert(currentLanguage === 'en' ? 
+                    'Results submitted successfully! Thank you for participating.' :
+                    '结果提交成功！感谢您的参与。');
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert(currentLanguage === 'en' ? 
+                    'Error submitting results. Please try again.' :
+                    '提交结果时出错。请重试。');
+            });
+        }
+
+        function downloadResults() {
             const firstMethodName = randomizedOrder === 'hva-first' ? 'HVA-X' : 'Grad-CAM';
             const secondMethodName = randomizedOrder === 'hva-first' ? 'Grad-CAM' : 'HVA-X';
             
@@ -1071,82 +1175,52 @@ The agent profiles as a **"glass cannon": strategically brilliant but tactically
                 'Preference'
             ];
             
+            // Create first evaluation JSON object
+            const firstEvaluationResult = {
+                method: firstMethodName,
+                language: currentLanguage,
+                order: randomizedOrder,
+                timestamp: new Date().toISOString(),
+                evaluations: {}
+            };
+            
             // Add first evaluation data
             dimensionNames.forEach((dimension, index) => {
                 const score = firstEvaluationData[index];
-                csvContent += `${firstMethodName},${dimension},${score}\n`;
+                firstEvaluationResult.evaluations[dimension] = score;
             });
+            
+            // Create second evaluation JSON object
+            const secondEvaluationResult = {
+                method: secondMethodName,
+                language: currentLanguage,
+                order: randomizedOrder,
+                timestamp: new Date().toISOString(),
+                evaluations: {}
+            };
             
             // Add second evaluation data
             dimensionNames.forEach((dimension, index) => {
                 const score = secondEvaluationData[index];
-                csvContent += `${secondMethodName},${dimension},${score}\n`;
+                secondEvaluationResult.evaluations[dimension] = score;
             });
             
-            // Add metadata
-            csvContent += `\nMetadata\n`;
-            csvContent += `Language,${currentLanguage}\n`;
-            csvContent += `Order,${randomizedOrder}\n`;
-            csvContent += `Timestamp,${new Date().toISOString()}\n`;
+            // Combine into a list
+            const results = [firstEvaluationResult, secondEvaluationResult];
             
-            const fileName = `hva_gradcam_${currentLanguage}_${randomizedOrder}_${new Date().toISOString().split('T')[0]}.csv`;
+            // Convert to JSON string
+            const jsonContent = JSON.stringify(results, null, 2);
             
-            // Download CSV locally
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', fileName);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Generate timestamp in YYYYMMDD_HHMMSS format
+            const now = new Date();
+            const pad = n => n.toString().padStart(2, '0');
+            const timestamp = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
             
-            // Try to upload to Google Drive
-            uploadToGoogleDrive(csvContent, fileName);
-            
-            alert(currentLanguage === 'en' ? 
-                'Results downloaded successfully! Saving to server...' :
-                '结果下载成功！正在保存到服务器...');
+            // Submit to Netlify Forms
+            submitToNetlify(firstEvaluationResult, secondEvaluationResult, results, timestamp);
         }
 
-        function uploadToGoogleDrive(csvContent, fileName) {
-            // Upload to local server
-            fetch('/upload-csv', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    csvContent: csvContent,
-                    fileName: fileName
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Successfully saved results:', data.filename);
-                    alert(currentLanguage === 'en' ? 
-                        `Results saved successfully as ${data.filename}!` :
-                        `结果已成功保存为 ${data.filename}！`);
-                } else {
-                    console.log('Failed to save results:', data.error);
-                    showManualUploadInstructions(fileName);
-                }
-            })
-            .catch(error => {
-                console.log('Error saving results:', error);
-                showManualUploadInstructions(fileName);
-            });
-        }
 
-        function showManualUploadInstructions(fileName) {
-            const instructions = currentLanguage === 'en' ? 
-                `Results saved locally as "${fileName}". The file has been downloaded to your computer.` :
-                `结果已本地保存为"${fileName}"。文件已下载到您的计算机。`;
-            
-            alert(instructions);
-        }
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
