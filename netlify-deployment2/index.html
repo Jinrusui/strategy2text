@@ -133,6 +133,12 @@
             <p>• The study will take approximately 20 minutes total</p>
         </div>
         
+        <div style="text-align: center; margin: 30px 0;">
+            <button onclick="resetAllData()" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                🔄 Reset All Study Data
+            </button>
+        </div>
+        
         <div class="footer">
             <p>Thank you for participating in our research!</p>
         </div>
@@ -153,6 +159,18 @@
             setTimeout(() => {
                 window.location.href = 'short-study.html';
             }, 1000);
+        }
+
+        function resetAllData() {
+            const confirmReset = confirm('Are you sure you want to reset all study data? This will clear any saved progress and rankings. This action cannot be undone.');
+            if (confirmReset) {
+                // Clear all localStorage data
+                localStorage.removeItem('shortStudyResults_v2');
+                localStorage.removeItem('studySubmitted_v2');
+                localStorage.removeItem('comprehensiveResults_v2');
+                
+                alert('All study data has been reset successfully.');
+            }
         }
     </script>
 </body>

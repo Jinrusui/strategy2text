@@ -207,12 +207,12 @@ def main():
     """Main function to run the video analysis."""
     parser = argparse.ArgumentParser(description="Analyze videos using Gemini video understanding API")
     parser.add_argument("video_files", nargs="*", help="Video files to analyze")
-    parser.add_argument("--video-dir", type=str, help="Directory containing video files")
-    parser.add_argument("--output-dir", type=str, default="video_analysis_results", 
+    parser.add_argument("-v", "--video-dir", type=str, help="Directory containing video files")
+    parser.add_argument("-o", "--output-dir", type=str, default="video_analysis_results", 
                        help="Output directory for analysis results")
-    parser.add_argument("--include-pattern", type=str, default="*.mp4", 
+    parser.add_argument("-i", "--include-pattern", type=str, default="*.mp4", 
                        help="Pattern to match video files (default: *.mp4)")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
+    parser.add_argument( "--verbose", action="store_true", help="Enable verbose logging")
     
     args = parser.parse_args()
     

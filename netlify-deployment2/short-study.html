@@ -40,6 +40,29 @@
             font-weight: 300;
         }
 
+        .reset-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        .reset-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+        }
+
         .content {
             padding: 40px;
         }
@@ -292,6 +315,7 @@
 <body>
     <div class="container">
         <div class="header">
+            <button class="reset-button" onclick="resetAllData()">🔄 Reset Study</button>
             <h1>Part 1: Short Clip Analysis</h1>
             <p>Ranking AI analysis methods by effectiveness</p>
             <div class="progress-bar">
@@ -492,6 +516,7 @@
             {
                 id: 'image',
                 title: 'Frame-by-Frame Image Analysis',
+                shortName: 'Image',
                 type: 'text',
                 contentIds: ['image-analysis-1', 'image-analysis-2', 'image-analysis-3'],
                 files: ['frames_2-13s.md', 'frames_15-25s.md', 'frames_28-41s.md'],
@@ -500,6 +525,7 @@
             {
                 id: 'video',
                 title: 'Video-Based Analysis',
+                shortName: 'Video',
                 type: 'text',
                 contentIds: ['video-analysis-1', 'video-analysis-2', 'video-analysis-3'],
                 files: ['demo_2-13s_analysis.md', 'demo_15-25s_analysis.md', 'demo_28-41s_analysis.md'],
@@ -508,6 +534,7 @@
             {
                 id: 'gradcam',
                 title: 'Grad-CAM Visualization',
+                shortName: 'Grad-CAM',
                 type: 'video',
                 videos: ['grad-cam_2s-13s.mp4', 'grad-cam_15s-25s.mp4', 'grad-cam_28s-41s.mp4'],
                 description: '<strong>What is Grad-CAM?</strong> Grad-CAM (Gradient-weighted Class Activation Mapping) is a visualization technique that highlights the regions of the input image that the AI model is focusing on when making decisions. Brighter/warmer colors indicate areas of higher attention.'
@@ -635,12 +662,26 @@
                         <span>Least Preferred</span>
                     </div>
                     <div class="method-cards" style="margin-top: 15px; text-align: center;">
-                        ${analysisMethodsByClip[clipNumber - 1].map(method => 
-                            `<div class="method-card" draggable="true" data-method="${method.label}">Method ${method.label}</div>`
-                        ).join('')}
+                        <!-- Method cards will be added dynamically for each dimension -->
                     </div>
                 `;
                 container.appendChild(dimensionDiv);
+            });
+
+            // Add method cards to each dimension's method-cards container
+            const clipMethods = analysisMethodsByClip[clipNumber - 1];
+            container.querySelectorAll('.method-cards').forEach(methodCardsContainer => {
+                clipMethods.forEach(method => {
+                    const methodCard = document.createElement('div');
+                    methodCard.className = 'method-card';
+                    methodCard.draggable = true;
+                    methodCard.dataset.method = method.label;
+                    methodCard.dataset.methodType = method.id;
+                    methodCard.textContent = `Method ${method.label} (${method.shortName})`;
+                    methodCard.addEventListener('dragstart', handleDragStart);
+                    methodCard.addEventListener('dragend', handleDragEnd);
+                    methodCardsContainer.appendChild(methodCard);
+                });
             });
 
             // Add drag and drop functionality
@@ -724,14 +765,24 @@
 
                         // Place cards in their ranked positions
                         for (let pos = 1; pos <= 3; pos++) {
-                            const method = ranking[pos];
-                            if (method) {
+                            const methodData = ranking[pos];
+                            if (methodData) {
                                 const dropZone = rankingArea.querySelector(`[data-position="${pos}"]`);
                                 const methodCard = document.createElement('div');
                                 methodCard.className = 'method-card';
                                 methodCard.draggable = true;
-                                methodCard.dataset.method = method;
-                                methodCard.textContent = `Method ${method}`;
+                                // Handle both old format (string) and new format (object)
+                                if (typeof methodData === 'string') {
+                                    methodCard.dataset.method = methodData;
+                                    methodCard.textContent = `Method ${methodData}`;
+                                } else {
+                                    methodCard.dataset.method = methodData.label;
+                                    methodCard.dataset.methodType = methodData.methodType;
+                                    // Find the method info to get the display text
+                                    const clipMethods = analysisMethodsByClip[clipNumber - 1];
+                                    const methodInfo = clipMethods.find(m => m.label === methodData.label);
+                                    methodCard.textContent = methodInfo ? `Method ${methodInfo.label} (${methodInfo.shortName})` : `Method ${methodData.label}`;
+                                }
                                 methodCard.addEventListener('dragstart', handleDragStart);
                                 methodCard.addEventListener('dragend', handleDragEnd);
                                 dropZone.innerHTML = '';
@@ -740,14 +791,18 @@
                         }
 
                         // Add remaining unranked cards back to method-cards
-                        const usedMethods = Object.values(ranking);
-                        ['A', 'B', 'C'].forEach(method => {
-                            if (!usedMethods.includes(method)) {
+                        const usedMethods = Object.values(ranking).map(methodData => 
+                            typeof methodData === 'string' ? methodData : methodData.label
+                        );
+                        const clipMethods = analysisMethodsByClip[clipNumber - 1];
+                        clipMethods.forEach(methodInfo => {
+                            if (!usedMethods.includes(methodInfo.label)) {
                                 const methodCard = document.createElement('div');
                                 methodCard.className = 'method-card';
                                 methodCard.draggable = true;
-                                methodCard.dataset.method = method;
-                                methodCard.textContent = `Method ${method}`;
+                                methodCard.dataset.method = methodInfo.label;
+                                methodCard.dataset.methodType = methodInfo.id;
+                                methodCard.textContent = `Method ${methodInfo.label} (${methodInfo.shortName})`;
                                 methodCard.addEventListener('dragstart', handleDragStart);
                                 methodCard.addEventListener('dragend', handleDragEnd);
                                 methodCardsContainer.appendChild(methodCard);
@@ -773,6 +828,7 @@
                 const dimension = rankingArea.dataset.dimension;
                 const targetPosition = parseInt(dropZone.dataset.position);
                 const draggedMethod = draggedElement.dataset.method;
+                const draggedMethodType = draggedElement.dataset.methodType;
 
                 // Check if dragged element is coming from another drop zone (for swapping)
                 const draggedFromDropZone = draggedElement.closest('.drop-zone');
@@ -790,7 +846,8 @@
                     swapCard.className = 'method-card';
                     swapCard.draggable = true;
                     swapCard.dataset.method = existingMethod;
-                    swapCard.textContent = `Method ${existingMethod}`;
+                    swapCard.dataset.methodType = existingCard.dataset.methodType;
+                    swapCard.textContent = existingCard.textContent;
                     swapCard.addEventListener('dragstart', handleDragStart);
                     swapCard.addEventListener('dragend', handleDragEnd);
                     
@@ -803,7 +860,8 @@
                     newCard.className = 'method-card';
                     newCard.draggable = true;
                     newCard.dataset.method = draggedMethod;
-                    newCard.textContent = `Method ${draggedMethod}`;
+                    newCard.dataset.methodType = draggedMethodType;
+                    newCard.textContent = draggedElement.textContent;
                     newCard.addEventListener('dragstart', handleDragStart);
                     newCard.addEventListener('dragend', handleDragEnd);
                     dropZone.appendChild(newCard);
@@ -815,8 +873,14 @@
                     if (!studyResults.clips[clipNum - 1].rankings[dimension]) {
                         studyResults.clips[clipNum - 1].rankings[dimension] = {};
                     }
-                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = draggedMethod;
-                    studyResults.clips[clipNum - 1].rankings[dimension][sourcePosition] = existingMethod;
+                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = {
+                        label: draggedMethod,
+                        methodType: draggedMethodType
+                    };
+                    studyResults.clips[clipNum - 1].rankings[dimension][sourcePosition] = {
+                        label: existingMethod,
+                        methodType: existingCard.dataset.methodType
+                    };
                     
                 } else if (existingCard) {
                     // REPLACE: Move existing card back to method-cards area
@@ -825,7 +889,8 @@
                     returnCard.className = 'method-card';
                     returnCard.draggable = true;
                     returnCard.dataset.method = existingCard.dataset.method;
-                    returnCard.textContent = `Method ${existingCard.dataset.method}`;
+                    returnCard.dataset.methodType = existingCard.dataset.methodType;
+                    returnCard.textContent = existingCard.textContent;
                     returnCard.addEventListener('dragstart', handleDragStart);
                     returnCard.addEventListener('dragend', handleDragEnd);
                     methodCardsContainer.appendChild(returnCard);
@@ -836,7 +901,8 @@
                     newCard.className = 'method-card';
                     newCard.draggable = true;
                     newCard.dataset.method = draggedMethod;
-                    newCard.textContent = `Method ${draggedMethod}`;
+                    newCard.dataset.methodType = draggedMethodType;
+                    newCard.textContent = draggedElement.textContent;
                     newCard.addEventListener('dragstart', handleDragStart);
                     newCard.addEventListener('dragend', handleDragEnd);
                     dropZone.appendChild(newCard);
@@ -848,7 +914,10 @@
                     if (!studyResults.clips[clipNum - 1].rankings[dimension]) {
                         studyResults.clips[clipNum - 1].rankings[dimension] = {};
                     }
-                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = draggedMethod;
+                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = {
+                        label: draggedMethod,
+                        methodType: draggedMethodType
+                    };
                     
                 } else {
                     // SIMPLE DROP: Empty drop zone
@@ -857,7 +926,8 @@
                     newCard.className = 'method-card';
                     newCard.draggable = true;
                     newCard.dataset.method = draggedMethod;
-                    newCard.textContent = `Method ${draggedMethod}`;
+                    newCard.dataset.methodType = draggedMethodType;
+                    newCard.textContent = draggedElement.textContent;
                     newCard.addEventListener('dragstart', handleDragStart);
                     newCard.addEventListener('dragend', handleDragEnd);
                     dropZone.appendChild(newCard);
@@ -869,7 +939,10 @@
                     if (!studyResults.clips[clipNum - 1].rankings[dimension]) {
                         studyResults.clips[clipNum - 1].rankings[dimension] = {};
                     }
-                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = draggedMethod;
+                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = {
+                        label: draggedMethod,
+                        methodType: draggedMethodType
+                    };
                 }
 
                 // Remove original dragged element if it's not from a drop zone
@@ -944,6 +1017,12 @@
         }
 
         function submitResults() {
+            // Confirm before submitting
+            const confirmSubmit = confirm('Are you sure you want to submit your results and continue to Part 2? You cannot modify your answers after submission.');
+            if (!confirmSubmit) {
+                return;
+            }
+            
             // Prepare form data for Netlify
             const form = document.querySelector('form[name="short-study-results"]');
             form.querySelector('[name="timestamp"]').value = new Date().toISOString();
@@ -953,11 +1032,16 @@
                 dimensions.forEach(dim => {
                     const ranking = studyResults.clips[clipNum - 1].rankings?.[dim.id];
                     if (ranking) {
-                        // Convert position-based ranking to method order string
+                        // Convert position-based ranking to method order string using method types
                         const orderedMethods = [];
                         for (let pos = 1; pos <= 3; pos++) {
                             if (ranking[pos]) {
-                                orderedMethods.push(ranking[pos]);
+                                // Handle both old format (string) and new format (object)
+                                if (typeof ranking[pos] === 'string') {
+                                    orderedMethods.push(ranking[pos]);
+                                } else {
+                                    orderedMethods.push(ranking[pos].methodType);
+                                }
                             }
                         }
                         const rankingString = orderedMethods.join('>');
@@ -985,6 +1069,23 @@
                 // Still proceed to next part even if submission fails
                 window.location.href = 'comprehensive-study.html';
             });
+        }
+
+        // Reset all study data
+        function resetAllData() {
+            const confirmReset = confirm('Are you sure you want to reset all study data? This will clear all your progress and rankings, and you will start fresh. This action cannot be undone.');
+            if (confirmReset) {
+                // Clear all localStorage data
+                localStorage.removeItem('shortStudyResults_v2');
+                localStorage.removeItem('studySubmitted_v2');
+                localStorage.removeItem('comprehensiveResults_v2');
+                
+                // Show success message
+                alert('All study data has been reset. The page will reload to start fresh.');
+                
+                // Reload the page to start fresh
+                window.location.reload();
+            }
         }
 
         // Initialize
