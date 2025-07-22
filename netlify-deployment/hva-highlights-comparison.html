@@ -1121,7 +1121,29 @@ The agent profiles as a **"glass cannon": strategically brilliant but tactically
             nextPhase();
         }
 
+        // Add global variable to track submission state
+        let isSubmitting = false;
+        let hasSubmitted = false;
+
         function submitToNetlify(firstEvaluationResult, secondEvaluationResult, results, timestamp) {
+            // Prevent multiple submissions
+            if (isSubmitting || hasSubmitted) {
+                alert(currentLanguage === 'en' ? 
+                    'Form has already been submitted or is currently being submitted.' :
+                    '表单已经提交或正在提交中。');
+                return;
+            }
+            
+            // Set submission state
+            isSubmitting = true;
+            
+            // Disable the download button to prevent multiple clicks
+            const downloadBtn = document.querySelector('.download-btn');
+            if (downloadBtn) {
+                downloadBtn.disabled = true;
+                downloadBtn.textContent = currentLanguage === 'en' ? 'Submitting...' : '提交中...';
+            }
+            
             // Get the hidden form
             const form = document.querySelector('form[name="study-results"]');
             
@@ -1162,12 +1184,27 @@ The agent profiles as a **"glass cannon": strategically brilliant but tactically
                 body: new URLSearchParams(formData).toString()
             })
             .then(() => {
+                hasSubmitted = true;
                 alert(currentLanguage === 'en' ? 
                     'Results submitted successfully! Thank you for participating.' :
                     '结果提交成功！感谢您的参与。');
+                
+                // Update button to show completion
+                if (downloadBtn) {
+                    downloadBtn.textContent = currentLanguage === 'en' ? 'Submitted ✓' : '已提交 ✓';
+                    downloadBtn.style.backgroundColor = '#27ae60';
+                }
             })
             .catch((error) => {
                 console.error('Error:', error);
+                isSubmitting = false; // Reset on error to allow retry
+                
+                // Re-enable button on error
+                if (downloadBtn) {
+                    downloadBtn.disabled = false;
+                    downloadBtn.textContent = currentLanguage === 'en' ? 'Download Results' : '下载结果';
+                }
+                
                 alert(currentLanguage === 'en' ? 
                     'Error submitting results. Please try again.' :
                     '提交结果时出错。请重试。');

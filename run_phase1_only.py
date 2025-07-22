@@ -20,7 +20,7 @@ from video_processing import VideoLoader, TrajectoryData
 
 def run_phase1_only(video_dir: Optional[str] = None, score_file: Optional[str] = None, 
                    csv_file: Optional[str] = None, samples_per_tier: int = 3, 
-                   output_prefix: str = "phase1_sampling") -> Dict[str, Any]:
+                   output_prefix: str = "phase1_sampling", direct_mode: bool = False) -> Dict[str, Any]:
     """
     Run only Phase 1 (Trajectory Sampling and Stratification) of HVA-X algorithm.
     
@@ -28,58 +28,96 @@ def run_phase1_only(video_dir: Optional[str] = None, score_file: Optional[str] =
         video_dir: Directory containing video files
         score_file: Path to scores.txt file
         csv_file: Path to trajectory_data.csv file
-        samples_per_tier: Number of samples per performance tier
+        samples_per_tier: Number of samples per performance tier (ignored in direct mode)
         output_prefix: Prefix for output files
+        direct_mode: If True, process all videos directly without stratification
         
     Returns:
         Dictionary with Phase 1 results
     """
     
-    logging.info("🚀 Starting HVA-X Phase 1: Trajectory Sampling and Stratification")
+    if direct_mode:
+        logging.info("🚀 Starting HVA-X Phase 1: Direct Video Processing (No Stratification)")
+    else:
+        logging.info("🚀 Starting HVA-X Phase 1: Trajectory Sampling and Stratification")
+    
     if video_dir:
         logging.info(f"📁 Video directory: {video_dir}")
     if csv_file:
         logging.info(f"📋 CSV file: {csv_file}")
-    logging.info(f"📊 Samples per tier: {samples_per_tier}")
+    if not direct_mode:
+        logging.info(f"📊 Samples per tier: {samples_per_tier}")
     
     # Initialize video loader
     video_loader = VideoLoader()
     
     try:
-        # Load trajectory data
-        if csv_file:
-            logging.info(f"📋 Loading trajectory data from CSV: {csv_file}")
-            trajectories = video_loader.load_trajectory_data_from_csv(csv_file)
-        elif score_file and video_dir:
-            logging.info(f"📋 Loading trajectory data from directory and score file")
-            trajectories = video_loader.load_trajectory_data_from_files(video_dir, score_file)
-        elif video_dir:
-            # Try to find score files automatically
-            video_path = Path(video_dir)
-            csv_path = video_path / "trajectory_data.csv"
-            scores_path = video_path / "scores.txt"
+        if direct_mode:
+            # Direct mode: Load all videos from directory without scores/stratification
+            if not video_dir:
+                raise ValueError("Direct mode requires --video-dir")
             
-            if csv_path.exists():
-                logging.info(f"📋 Found CSV file: {csv_path}")
-                trajectories = video_loader.load_trajectory_data_from_csv(str(csv_path))
-            elif scores_path.exists():
-                logging.info(f"📋 Found scores file: {scores_path}")
-                trajectories = video_loader.load_trajectory_data_from_files(video_dir, str(scores_path))
-            else:
-                raise FileNotFoundError(
-                    "No score file found. Please provide --score-file or --csv-file, "
-                    "or ensure trajectory_data.csv or scores.txt exists in the video directory."
-                )
+            logging.info(f"📋 Loading all videos from directory in direct mode")
+            video_files = video_loader.find_videos(video_dir)
+            
+            if not video_files:
+                raise FileNotFoundError(f"No video files found in directory: {video_dir}")
+            
+            # Create trajectory data with dummy scores (not used in direct mode)
+            trajectories = []
+            for i, video_path in enumerate(video_files):
+                # Extract episode ID from filename
+                episode_id = Path(video_path).stem
+                trajectories.append(TrajectoryData(
+                    video_path=video_path,
+                    score=0.0,  # Dummy score for direct mode
+                    episode_id=episode_id
+                ))
+            
+            logging.info(f"📊 Loaded {len(trajectories)} videos in direct mode")
+            
+            # In direct mode, put all trajectories in a single "all_videos" tier
+            sampled_trajectories = {
+                "all_videos": trajectories
+            }
+            
         else:
-            raise ValueError("Must provide either --video-dir or --csv-file")
-        
-        logging.info(f"📊 Loaded {len(trajectories)} total trajectories")
-        
-        # Run Phase 1: Trajectory Sampling and Stratification
-        logging.info("🔄 Running Phase 1: Trajectory Sampling and Stratification")
-        sampled_trajectories = video_loader.prepare_trajectories_for_hva(
-            trajectories, samples_per_tier
-        )
+            # Original tier-based mode
+            # Load trajectory data
+            if csv_file:
+                logging.info(f"📋 Loading trajectory data from CSV: {csv_file}")
+                trajectories = video_loader.load_trajectory_data_from_csv(csv_file)
+            elif score_file and video_dir:
+                logging.info(f"📋 Loading trajectory data from directory and score file")
+                trajectories = video_loader.load_trajectory_data_from_files(video_dir, score_file)
+            elif video_dir:
+                # Try to find score files automatically
+                video_path = Path(video_dir)
+                csv_path = video_path / "trajectory_data.csv"
+                scores_path = video_path / "scores.txt"
+                
+                if csv_path.exists():
+                    logging.info(f"📋 Found CSV file: {csv_path}")
+                    trajectories = video_loader.load_trajectory_data_from_csv(str(csv_path))
+                elif scores_path.exists():
+                    logging.info(f"📋 Found scores file: {scores_path}")
+                    trajectories = video_loader.load_trajectory_data_from_files(video_dir, str(scores_path))
+                else:
+                    raise FileNotFoundError(
+                        "No score file found. Please provide --score-file or --csv-file, "
+                        "or ensure trajectory_data.csv or scores.txt exists in the video directory, "
+                        "or use --direct-mode to process all videos without scores."
+                    )
+            else:
+                raise ValueError("Must provide either --video-dir or --csv-file")
+            
+            logging.info(f"📊 Loaded {len(trajectories)} total trajectories")
+            
+            # Run Phase 1: Trajectory Sampling and Stratification
+            logging.info("🔄 Running Phase 1: Trajectory Sampling and Stratification")
+            sampled_trajectories = video_loader.prepare_trajectories_for_hva(
+                trajectories, samples_per_tier
+            )
         
         # Calculate statistics
         total_sampled = sum(len(trajs) for trajs in sampled_trajectories.values())
@@ -87,20 +125,33 @@ def run_phase1_only(video_dir: Optional[str] = None, score_file: Optional[str] =
         
         for tier_name, trajs in sampled_trajectories.items():
             if trajs:
-                scores = [t.score for t in trajs]
-                tier_stats[tier_name] = {
-                    "count": len(trajs),
-                    "min_score": min(scores),
-                    "max_score": max(scores),
-                    "avg_score": sum(scores) / len(scores),
-                    "trajectories": [
-                        {
-                            "episode_id": t.episode_id,
-                            "video_path": t.video_path,
-                            "score": t.score
-                        } for t in trajs
-                    ]
-                }
+                if direct_mode:
+                    # In direct mode, don't calculate score statistics
+                    tier_stats[tier_name] = {
+                        "count": len(trajs),
+                        "trajectories": [
+                            {
+                                "episode_id": t.episode_id,
+                                "video_path": t.video_path,
+                                "score": t.score if not direct_mode else None
+                            } for t in trajs
+                        ]
+                    }
+                else:
+                    scores = [t.score for t in trajs]
+                    tier_stats[tier_name] = {
+                        "count": len(trajs),
+                        "min_score": min(scores),
+                        "max_score": max(scores),
+                        "avg_score": sum(scores) / len(scores),
+                        "trajectories": [
+                            {
+                                "episode_id": t.episode_id,
+                                "video_path": t.video_path,
+                                "score": t.score
+                            } for t in trajs
+                        ]
+                    }
             else:
                 tier_stats[tier_name] = {
                     "count": 0,
@@ -110,12 +161,13 @@ def run_phase1_only(video_dir: Optional[str] = None, score_file: Optional[str] =
         # Compile results
         results = {
             "algorithm": "HVA-X",
-            "phase": "Phase 1 - Trajectory Sampling and Stratification",
+            "phase": "Phase 1 - Direct Video Processing" if direct_mode else "Phase 1 - Trajectory Sampling and Stratification",
             "timestamp": datetime.now().isoformat(),
             "input_data": {
-                "total_trajectories": len(trajectories),
-                "samples_per_tier": samples_per_tier,
-                "source": "csv" if csv_file else "directory"
+                "total_trajectories": len(trajectories) if 'trajectories' in locals() else total_sampled,
+                "samples_per_tier": samples_per_tier if not direct_mode else None,
+                "source": "direct_mode" if direct_mode else ("csv" if csv_file else "directory"),
+                "direct_mode": direct_mode
             },
             "sampling_results": {
                 "total_sampled": total_sampled,
@@ -166,24 +218,38 @@ def print_phase1_summary(results: Dict[str, Any]):
     Args:
         results: Phase 1 results dictionary
     """
+    direct_mode = results['input_data'].get('direct_mode', False)
+    
     print("\n" + "="*60)
-    print("🎯 HVA-X PHASE 1 COMPLETE")
+    if direct_mode:
+        print("🎯 HVA-X PHASE 1 COMPLETE (DIRECT MODE)")
+    else:
+        print("🎯 HVA-X PHASE 1 COMPLETE")
     print("="*60)
     
     print(f"📊 Total trajectories loaded: {results['input_data']['total_trajectories']}")
-    print(f"📈 Total trajectories sampled: {results['sampling_results']['total_sampled']}")
-    print(f"⏱️  Sampling timestamp: {results['timestamp']}")
+    print(f"📈 Total trajectories processed: {results['sampling_results']['total_sampled']}")
+    print(f"⏱️  Processing timestamp: {results['timestamp']}")
     
-    print(f"\n🔍 Tier Breakdown:")
-    for tier_name, stats in results['sampling_results']['tier_statistics'].items():
-        print(f"   {tier_name.replace('_', ' ').title()}: {stats['count']} trajectories")
-        if stats['count'] > 0:
-            print(f"     Score range: {stats['min_score']:.2f} - {stats['max_score']:.2f}")
-            print(f"     Average score: {stats['avg_score']:.2f}")
-            print(f"     Episodes: {', '.join([t['episode_id'] for t in stats['trajectories']])}")
+    if direct_mode:
+        print(f"\n🔍 Video Processing (Direct Mode):")
+        for tier_name, stats in results['sampling_results']['tier_statistics'].items():
+            print(f"   {tier_name.replace('_', ' ').title()}: {stats['count']} videos")
+            if stats['count'] > 0:
+                print(f"     Episodes: {', '.join([t['episode_id'] for t in stats['trajectories'][:5]])}")
+                if stats['count'] > 5:
+                    print(f"     ... and {stats['count'] - 5} more")
+    else:
+        print(f"\n🔍 Tier Breakdown:")
+        for tier_name, stats in results['sampling_results']['tier_statistics'].items():
+            print(f"   {tier_name.replace('_', ' ').title()}: {stats['count']} trajectories")
+            if stats['count'] > 0:
+                print(f"     Score range: {stats['min_score']:.2f} - {stats['max_score']:.2f}")
+                print(f"     Average score: {stats['avg_score']:.2f}")
+                print(f"     Episodes: {', '.join([t['episode_id'] for t in stats['trajectories']])}")
     
     print(f"\n📋 Next Steps:")
-    print(f"   - Use sampled trajectories for Phase 2 (Individual Analysis)")
+    print(f"   - Use processed trajectories for Phase 2 (Individual Analysis)")
     print(f"   - Run full HVA-X analysis with: python run_hva_analysis.py")
     print(f"   - Or continue with manual analysis of selected episodes")
 
@@ -206,6 +272,9 @@ Examples:
 
   # Sample more trajectories per tier
   python run_phase1_only.py --video-dir hva_videos --samples-per-tier 5
+
+  # Process all videos directly without stratification
+  python run_phase1_only.py --video-dir video_clips_30s --direct-mode
         """
     )
     
@@ -221,6 +290,8 @@ Examples:
                        help="Prefix for output files (default: phase1_sampling)")
     parser.add_argument("--verbose", action="store_true",
                        help="Enable verbose logging")
+    parser.add_argument("--direct-mode", action="store_true",
+                       help="Process all videos directly without stratification")
     
     args = parser.parse_args()
     
@@ -232,8 +303,12 @@ Examples:
     )
     
     # Validate arguments
-    if not args.csv_file and not args.video_dir:
-        parser.error("Must provide either --video-dir or --csv-file")
+    if args.direct_mode:
+        if not args.video_dir:
+            parser.error("Direct mode requires --video-dir")
+    else:
+        if not args.csv_file and not args.video_dir:
+            parser.error("Must provide either --video-dir or --csv-file")
     
     try:
         # Run Phase 1
@@ -242,7 +317,8 @@ Examples:
             score_file=args.score_file,
             csv_file=args.csv_file,
             samples_per_tier=args.samples_per_tier,
-            output_prefix=args.output_prefix
+            output_prefix=args.output_prefix,
+            direct_mode=args.direct_mode
         )
         
         # Generate output filename with timestamp

@@ -80,6 +80,49 @@ python run.py \
 - `--fps`: Video frames per second (default: 5)
 - `--pause`: Add pause frames at start/end of videos (default: 0)
 
+**Seeding for Fair Method Comparison:**
+- `--seed`: Base environment seed (default: 0)
+- `--seed-mode`: Seeding strategy for method comparison:
+  - `fixed`: All traces use same seed (default, original behavior)
+  - `sequential`: Sequential seeds starting from base seed
+  - `random`: Random seeds (reproducible with base seed)
+  - `trace-specific`: Use specific seeds for each trace
+- `--base-seed`: Base seed for sequential/random modes (default: same as --seed)
+- `--trace-seeds`: Comma-separated specific seeds for trace-specific mode
+- `--deterministic-eval`: Use deterministic policy evaluation (default: True)
+- `--save-seeds`: Save seed information in metadata for reproducibility (default: True)
+
+### Fair Method Comparison
+
+To compare different algorithms on the same game scenarios:
+
+```bash
+# Compare DQN, DDQN, and QR-DQN on identical scenarios
+for algo in dqn ddqn qrdqn; do
+  python run.py \
+    --env BreakoutNoFrameskip-v4 \
+    --algo $algo \
+    --seed-mode sequential \
+    --base-seed 42 \
+    --n-traces 10 \
+    --deterministic-eval \
+    --save-seeds
+done
+```
+
+Or use specific interesting scenarios:
+
+```bash
+# Define specific game scenarios to analyze
+python run.py \
+  --env BreakoutNoFrameskip-v4 \
+  --algo dqn \
+  --seed-mode trace-specific \
+  --trace-seeds 123,456,789,101112,131415 \
+  --n-traces 5 \
+  --deterministic-eval
+```
+
 ### Output
 
 The algorithm generates:
@@ -132,6 +175,63 @@ python run.py \
 ```
 
 This will generate 8 highlight videos showing the most important decision points where the DQN agent's Q-values indicated critical choices.
+
+## Method Comparison Examples
+
+### Using the Example Script
+
+The `example_usage.py` script provides convenient examples:
+
+```bash
+# Compare multiple methods on the same scenarios
+python example_usage.py --compare-methods
+
+# Analyze specific predefined scenarios
+python example_usage.py --specific-scenarios
+
+# Custom method comparison
+python example_usage.py \
+  --env BreakoutNoFrameskip-v4 \
+  --algo dqn \
+  --seed-mode sequential \
+  --base-seed 42 \
+  --n-traces 10
+```
+
+### Manual Method Comparison
+
+1. **Analyze DQN with sequential seeding:**
+```bash
+python run.py \
+  --env BreakoutNoFrameskip-v4 \
+  --algo dqn \
+  --seed-mode sequential \
+  --base-seed 42 \
+  --n-traces 5 \
+  --save-seeds
+```
+
+2. **Analyze QR-DQN on the same scenarios:**
+```bash
+python run.py \
+  --env BreakoutNoFrameskip-v4 \
+  --algo qrdqn \
+  --seed-mode sequential \
+  --base-seed 42 \
+  --n-traces 5 \
+  --save-seeds
+```
+
+Both runs will analyze the agents on identical game scenarios (seeds 42, 43, 44, 45, 46), enabling fair comparison of their decision-making strategies.
+
+### Reproducibility
+
+Each run saves complete seeding information in `metadata.json`:
+- Seeds used for each trace
+- Reproduction command
+- Seeding configuration
+
+This ensures that interesting scenarios can be re-analyzed or shared with other researchers.
 
 ## Dependencies
 

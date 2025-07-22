@@ -47,7 +47,15 @@ def run_highlights_analysis(env="CartPole-v1", algo="dqn", **kwargs):
     # Add optional parameters
     for key, value in kwargs.items():
         if value is not None:
-            cmd.extend([f"--{key.replace('_', '-')}", str(value)])
+            if key == 'trace_seeds' and isinstance(value, list):
+                # Handle list of seeds
+                cmd.extend([f"--{key.replace('_', '-')}", ','.join(map(str, value))])
+            elif isinstance(value, bool) and value:
+                # Handle boolean flags
+                cmd.append(f"--{key.replace('_', '-')}")
+            elif not isinstance(value, bool):
+                # Handle other parameters
+                cmd.extend([f"--{key.replace('_', '-')}", str(value)])
     
     print(f"Running HIGHLIGHTS analysis...")
     print(f"Command: {' '.join(cmd)}")
@@ -59,6 +67,85 @@ def run_highlights_analysis(env="CartPole-v1", algo="dqn", **kwargs):
     except subprocess.CalledProcessError as e:
         print(f"Error running HIGHLIGHTS: {e}")
         return False
+
+def compare_methods_example():
+    """Example of comparing different methods on the same game scenarios"""
+    print("\n" + "="*60)
+    print("FAIR METHOD COMPARISON EXAMPLE")
+    print("="*60)
+    
+    # Configuration for fair comparison
+    base_config = {
+        "env": "BreakoutNoFrameskip-v4",
+        "n_traces": 5,
+        "num_highlights": 3,
+        "trajectory_length": 10,
+        "base_seed": 42,
+        "seed_mode": "sequential",  # Use sequential seeds for reproducible scenarios
+        "deterministic_eval": True,  # Use deterministic policy evaluation
+        "save_seeds": True  # Save seed information for reproducibility
+    }
+    
+    # Methods to compare
+    methods = ["dqn", "qrdqn", "ddqn"]
+    
+    print("Comparing methods on the same game scenarios:")
+    print(f"Base seed: {base_config['base_seed']}")
+    print(f"Seed mode: {base_config['seed_mode']}")
+    print(f"Methods: {methods}")
+    print(f"Traces per method: {base_config['n_traces']}")
+    
+    for method in methods:
+        print(f"\nAnalyzing {method.upper()}...")
+        config = base_config.copy()
+        config["algo"] = method
+        
+        success = run_highlights_analysis(**config)
+        if not success:
+            print(f"Failed to analyze {method}")
+            continue
+        
+        print(f"{method.upper()} analysis completed!")
+    
+    print("\n" + "="*60)
+    print("COMPARISON COMPLETE")
+    print("="*60)
+    print("All methods were evaluated on the same game scenarios using:")
+    print(f"  Sequential seeds starting from {base_config['base_seed']}")
+    print(f"  Deterministic policy evaluation")
+    print("Check highlights/results/ for individual method results")
+    print("Seed information is saved in metadata.json for reproducibility")
+
+def specific_scenarios_example():
+    """Example of using specific predefined scenarios"""
+    print("\n" + "="*60)
+    print("SPECIFIC SCENARIOS EXAMPLE")
+    print("="*60)
+    
+    # Define specific scenarios (seeds) that are interesting
+    interesting_seeds = [123, 456, 789, 101112, 131415]
+    
+    config = {
+        "env": "BreakoutNoFrameskip-v4",
+        "algo": "dqn",
+        "seed_mode": "trace_specific",
+        "trace_seeds": interesting_seeds,
+        "n_traces": len(interesting_seeds),
+        "num_highlights": 3,
+        "deterministic_eval": True,
+        "save_seeds": True
+    }
+    
+    print("Using predefined interesting scenarios:")
+    print(f"Scenario seeds: {interesting_seeds}")
+    
+    success = run_highlights_analysis(**config)
+    
+    if success:
+        print("\nSpecific scenarios analysis completed!")
+        print("To analyze other methods on the same scenarios, use:")
+        print(f"  --seed-mode trace-specific")
+        print(f"  --trace-seeds {','.join(map(str, interesting_seeds))}")
 
 def main():
     parser = argparse.ArgumentParser(description="Example HIGHLIGHTS usage")
@@ -82,7 +169,27 @@ def main():
                        help="Use diversity-based selection")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     
+    # New seeding options
+    parser.add_argument("--seed-mode", default="fixed",
+                       choices=["fixed", "sequential", "random", "trace-specific"],
+                       help="Seeding strategy")
+    parser.add_argument("--base-seed", type=int, help="Base seed for seeding")
+    parser.add_argument("--trace-seeds", type=str, help="Comma-separated trace seeds")
+    parser.add_argument("--compare-methods", action="store_true",
+                       help="Run method comparison example")
+    parser.add_argument("--specific-scenarios", action="store_true",
+                       help="Run specific scenarios example")
+    
     args = parser.parse_args()
+    
+    # Handle special examples
+    if args.compare_methods:
+        compare_methods_example()
+        return True
+    
+    if args.specific_scenarios:
+        specific_scenarios_example()
+        return True
     
     print("="*60)
     print("HIGHLIGHTS Example Usage")
@@ -90,6 +197,7 @@ def main():
     print(f"Environment: {args.env}")
     print(f"Algorithm: {args.algo}")
     print(f"Model folder: {args.folder}")
+    print(f"Seed mode: {args.seed_mode}")
     print("="*60)
     
     # Check if model exists
@@ -106,15 +214,27 @@ def main():
             print(f"python -m rl_zoo3.train --algo {args.algo} --env {args.env}")
             return False
     
-    # Run HIGHLIGHTS analysis
+    # Prepare HIGHLIGHTS arguments
     highlights_kwargs = {
         "folder": args.folder,
         "n_traces": args.n_traces,
         "num_highlights": args.num_highlights,
         "trajectory_length": args.trajectory_length,
         "state_importance": args.state_importance,
-        "seed": args.seed
+        "seed": args.seed,
+        "seed_mode": args.seed_mode,
+        "deterministic_eval": True,
+        "save_seeds": True
     }
+    
+    # Handle base seed
+    if args.base_seed:
+        highlights_kwargs["base_seed"] = args.base_seed
+    
+    # Handle trace seeds
+    if args.trace_seeds:
+        trace_seeds = [int(s.strip()) for s in args.trace_seeds.split(',')]
+        highlights_kwargs["trace_seeds"] = trace_seeds
     
     if args.highlights_div:
         highlights_kwargs["highlights_div"] = True
@@ -131,6 +251,7 @@ def main():
         print("- State data (States.pkl)")
         print("- Trajectory data (Trajectories.pkl)")
         print("- Run metadata (metadata.json)")
+        print("\nFor method comparison, check metadata.json for reproduction commands")
         print("="*60)
     
     return success

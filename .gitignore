@@ -184,7 +184,7 @@ processed_data/
 # VIDEO & MEDIA FILES
 # =============================================================================
 # Video files (can be large)
-
+*.mp4
 hva_videos/*.mp4
 *.avi
 *.mov

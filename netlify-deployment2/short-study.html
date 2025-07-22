@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1: Short Clip Analysis Study</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .phase {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .phase.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .phase-header {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .video-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .video-player {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .method-analysis {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .method-title {
+            background: #4facfe;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .ranking-section {
+            background: #fff3cd;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #ffc107;
+        }
+
+        .ranking-title {
+            color: #856404;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .dimension-ranking {
+            margin: 25px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .dimension-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .dimension-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .ranking-area {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            min-height: 80px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .ranking-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .method-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: move;
+            user-select: none;
+            margin: 0 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            min-width: 120px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .method-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .method-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .drop-zone {
+            min-height: 60px;
+            border: 2px dashed #4facfe;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            background: rgba(79, 172, 254, 0.1);
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(79, 172, 254, 0.3);
+            border-color: #0056b3;
+        }
+
+        .drop-zone-label {
+            color: #4facfe;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .nav-button {
+            padding: 15px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.3s ease;
+        }
+
+        .game-intro {
+            background: #e8f4ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .game-intro h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .game-intro ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .game-intro li {
+            margin-bottom: 8px;
+        }
+
+        .completion-status {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #27ae60;
+        }
+
+        .completion-status.incomplete {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Part 1: Short Clip Analysis</h1>
+            <p>Ranking AI analysis methods by effectiveness</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Introduction Phase -->
+            <div class="phase active" id="intro-phase">
+                <div class="phase-header">
+                    <div style="font-size: 1.8em; font-weight: 600; color: #2c3e50; margin-bottom: 15px;">Introduction & Overview Video</div>
+                    <div style="font-size: 1.1em; color: #34495e; line-height: 1.6;">
+                        <p><strong>Welcome to Part 1!</strong> You'll first watch an overview of the full AI gameplay, then analyze three short clips using different methods.</p>
+                        
+                        <div class="game-intro">
+                            <h3>About the Breakout Game</h3>
+                            <p>The AI is playing the classic arcade game <strong>Breakout</strong>:</p>
+                            <ul>
+                                <li><strong>Basic Controls:</strong> Player controls a paddle at the bottom of the screen</li>
+                                <li><strong>Game Mechanics:</strong> Ball bounces around the screen, breaking bricks at the top</li>
+                                <li><strong>Objective:</strong> Clear all bricks while preventing the ball from falling below the paddle</li>
+                                <li><strong>Lives System:</strong> Player starts with multiple lives (typically 5), losing one each time the ball falls below the paddle</li>
+                                <li><strong>Advanced Strategy:</strong> Skilled players try to create a "tunnel" on one side to get the ball behind the brick wall for maximum efficiency</li>
+                            </ul>
+                        </div>
+
+                        <p><strong>Optional:</strong> You can watch the full 65-second gameplay video below to understand the AI's overall performance, or skip directly to the clip analysis.</p>
+                    </div>
+                </div>
+
+                <div class="video-container">
+                    <video class="video-player" controls>
+                        <source src="short_study/original_videos/demo_0-65s.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <div style="background: #e8f4ff; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #4facfe;">
+                    <p><strong>What you'll do next:</strong></p>
+                    <p>• Watch 3 short clips from this gameplay</p>
+                    <p>• For each clip, see 3 different analysis methods</p>
+                    <p>• For each evaluation dimension (clarity, usefulness, etc.), drag the methods to rank them in order of preference</p>
+                </div>
+
+                <div class="button-container">
+                    <button class="nav-button continue-btn" onclick="nextPhase()">Start Clip Analysis</button>
+                </div>
+            </div>
+
+            <!-- Clip Analysis Phases -->
+            <div class="phase" id="clip-1-phase">
+                <div class="phase-header">
+                    <div style="font-size: 1.8em; font-weight: 600; color: #2c3e50; margin-bottom: 15px;">Clip 1: Seconds 2-13</div>
+                    <div style="font-size: 1.1em; color: #34495e; line-height: 1.6;">
+                        <p>Watch this short clip and then analyze it using three different methods.</p>
+                    </div>
+                </div>
+
+                <div class="video-container">
+                    <video class="video-player" controls>
+                        <source src="short_study/original_videos/demo_2-13s.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <!-- Methods will be dynamically generated -->
+                <div id="methods-container-1"></div>
+
+                <div class="ranking-section">
+                    <div class="ranking-title">Rank Methods for Each Dimension</div>
+                    <p>For each evaluation dimension below, drag the method cards to rank them from <strong>best</strong> (left) to <strong>worst</strong> (right) for this clip:</p>
+                    
+                    <div id="ranking-dimensions-1"></div>
+                </div>
+
+                <div class="completion-status incomplete" id="completion-1">
+                    <p><strong>Please complete all rankings before continuing.</strong></p>
+                    <p>Progress: <span id="completion-count-1">0</span> / 8 dimensions ranked</p>
+                </div>
+
+                <div class="button-container">
+                    <button class="nav-button back-btn" onclick="previousPhase()">Back</button>
+                    <button class="nav-button continue-btn" onclick="nextPhase()" id="continue-1" disabled>Continue to Clip 2</button>
+                </div>
+            </div>
+
+            <div class="phase" id="clip-2-phase">
+                <div class="phase-header">
+                    <div style="font-size: 1.8em; font-weight: 600; color: #2c3e50; margin-bottom: 15px;">Clip 2: Seconds 15-25</div>
+                </div>
+
+                <div class="video-container">
+                    <video class="video-player" controls>
+                        <source src="short_study/original_videos/demo_15-25s.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <!-- Methods will be dynamically generated -->
+                <div id="methods-container-2"></div>
+
+                <div class="ranking-section">
+                    <div class="ranking-title">Rank Methods for Each Dimension</div>
+                    <div id="ranking-dimensions-2"></div>
+                </div>
+
+                <div class="completion-status incomplete" id="completion-2">
+                    <p>Progress: <span id="completion-count-2">0</span> / 8 dimensions ranked</p>
+                </div>
+
+                <div class="button-container">
+                    <button class="nav-button back-btn" onclick="previousPhase()">Back</button>
+                    <button class="nav-button continue-btn" onclick="nextPhase()" id="continue-2" disabled>Continue to Clip 3</button>
+                </div>
+            </div>
+
+            <div class="phase" id="clip-3-phase">
+                <div class="phase-header">
+                    <div style="font-size: 1.8em; font-weight: 600; color: #2c3e50; margin-bottom: 15px;">Clip 3: Seconds 28-41</div>
+                </div>
+
+                <div class="video-container">
+                    <video class="video-player" controls>
+                        <source src="short_study/original_videos/demo_28-41s.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <!-- Methods will be dynamically generated -->
+                <div id="methods-container-3"></div>
+
+                <div class="ranking-section">
+                    <div class="ranking-title">Rank Methods for Each Dimension</div>
+                    <div id="ranking-dimensions-3"></div>
+                </div>
+
+                <div class="completion-status incomplete" id="completion-3">
+                    <p>Progress: <span id="completion-count-3">0</span> / 8 dimensions ranked</p>
+                </div>
+
+                <div class="button-container">
+                    <button class="nav-button back-btn" onclick="previousPhase()">Back</button>
+                    <button class="nav-button continue-btn" onclick="nextPhase()" id="continue-3" disabled>Continue to Part 2</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden form for Netlify -->
+    <form name="short-study-results" method="POST" data-netlify="true" style="display: none;">
+        <input type="hidden" name="form-name" value="short-study-results" />
+        <input type="hidden" name="study-part" value="short-study" />
+        <input type="hidden" name="timestamp" />
+        <input type="hidden" name="clip1-clarity-ranking" />
+        <input type="hidden" name="clip1-understandable-ranking" />
+        <input type="hidden" name="clip1-completeness-ranking" />
+        <input type="hidden" name="clip1-satisfaction-ranking" />
+        <input type="hidden" name="clip1-useful-ranking" />
+        <input type="hidden" name="clip1-accuracy-ranking" />
+        <input type="hidden" name="clip1-improvement-ranking" />
+        <input type="hidden" name="clip1-preference-ranking" />
+        <input type="hidden" name="clip2-clarity-ranking" />
+        <input type="hidden" name="clip2-understandable-ranking" />
+        <input type="hidden" name="clip2-completeness-ranking" />
+        <input type="hidden" name="clip2-satisfaction-ranking" />
+        <input type="hidden" name="clip2-useful-ranking" />
+        <input type="hidden" name="clip2-accuracy-ranking" />
+        <input type="hidden" name="clip2-improvement-ranking" />
+        <input type="hidden" name="clip2-preference-ranking" />
+        <input type="hidden" name="clip3-clarity-ranking" />
+        <input type="hidden" name="clip3-understandable-ranking" />
+        <input type="hidden" name="clip3-completeness-ranking" />
+        <input type="hidden" name="clip3-satisfaction-ranking" />
+        <input type="hidden" name="clip3-useful-ranking" />
+        <input type="hidden" name="clip3-accuracy-ranking" />
+        <input type="hidden" name="clip3-improvement-ranking" />
+        <input type="hidden" name="clip3-preference-ranking" />
+        <input type="hidden" name="results-json" />
+    </form>
+
+    <script src="marked.min.js"></script>
+    <script>
+        // Scroll to top when page loads
+        window.addEventListener('load', function() {
+            window.scrollTo(0, 0);
+        });
+
+        let currentPhase = 0;
+        const phases = ['intro-phase', 'clip-1-phase', 'clip-2-phase', 'clip-3-phase'];
+        let studyResults = {
+            clips: [{}, {}, {}],
+            timestamp: new Date().toISOString()
+        };
+
+        // Define analysis methods
+        const analysisMethodsTemplate = [
+            {
+                id: 'image',
+                title: 'Frame-by-Frame Image Analysis',
+                type: 'text',
+                contentIds: ['image-analysis-1', 'image-analysis-2', 'image-analysis-3'],
+                files: ['frames_2-13s.md', 'frames_15-25s.md', 'frames_28-41s.md'],
+                folder: 'images_analysis'
+            },
+            {
+                id: 'video',
+                title: 'Video-Based Analysis',
+                type: 'text',
+                contentIds: ['video-analysis-1', 'video-analysis-2', 'video-analysis-3'],
+                files: ['demo_2-13s_analysis.md', 'demo_15-25s_analysis.md', 'demo_28-41s_analysis.md'],
+                folder: 'video_analysis'
+            },
+            {
+                id: 'gradcam',
+                title: 'Grad-CAM Visualization',
+                type: 'video',
+                videos: ['grad-cam_2s-13s.mp4', 'grad-cam_15s-25s.mp4', 'grad-cam_28s-41s.mp4'],
+                description: '<strong>What is Grad-CAM?</strong> Grad-CAM (Gradient-weighted Class Activation Mapping) is a visualization technique that highlights the regions of the input image that the AI model is focusing on when making decisions. Brighter/warmer colors indicate areas of higher attention.'
+            }
+        ];
+
+        // Randomize method order
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Create randomized methods for each clip independently
+        const analysisMethodsByClip = [];
+        for (let clipIndex = 0; clipIndex < 3; clipIndex++) {
+            const randomizedMethods = shuffleArray(analysisMethodsTemplate).map((method, index) => ({
+                ...method,
+                label: String.fromCharCode(65 + index) // A, B, C
+            }));
+            analysisMethodsByClip.push(randomizedMethods);
+            console.log(`Clip ${clipIndex + 1} randomized order:`, randomizedMethods.map(m => `${m.label}: ${m.title}`));
+        }
+
+        // Evaluation dimensions
+        const dimensions = [
+            { id: 'clarity', label: 'Clarity', statement: 'How clearly does this method describe the agent\'s behavior and decisions?' },
+            { id: 'understandable', label: 'Understandability', statement: 'How well can you understand the agent\'s decision-making based on this method?' },
+            { id: 'completeness', label: 'Completeness', statement: 'How completely does this method cover all important aspects of the agent\'s behavior?' },
+            { id: 'satisfaction', label: 'Satisfaction', statement: 'How satisfied are you with this method\'s explanation of the agent\'s behavior?' },
+            { id: 'useful', label: 'Usefulness', statement: 'How useful is this method for understanding the agent\'s gameplay and strategy?' },
+            { id: 'accuracy', label: 'Accuracy', statement: 'How accurately does this method reflect the agent\'s actual behavior?' },
+            { id: 'improvement', label: 'Insightfulness', statement: 'How much insight does this method provide beyond watching the raw gameplay?' },
+            { id: 'preference', label: 'Overall Preference', statement: 'Overall, how much do you prefer this method for understanding AI behavior?' }
+        ];
+
+        // Generate method HTML for a clip
+        function generateMethodHTML(method, clipNumber) {
+            const methodDiv = document.createElement('div');
+            methodDiv.className = 'method-analysis';
+            
+            if (method.type === 'text') {
+                methodDiv.innerHTML = `
+                    <div class="method-title">Method ${method.label}: ${method.title}</div>
+                    <div id="${method.id}-analysis-${clipNumber}"></div>
+                `;
+            } else if (method.type === 'video') {
+                methodDiv.innerHTML = `
+                    <div class="method-title">Method ${method.label}: ${method.title}</div>
+                    <div class="video-container">
+                        <video class="video-player" controls>
+                            <source src="short_study/grad_cam_clips/${method.videos[clipNumber - 1]}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <p style="margin-top: 15px;">${method.description}</p>
+                `;
+            }
+            
+            return methodDiv;
+        }
+
+        // Generate all methods for all clips
+        function generateAllMethods() {
+            for (let clipNumber = 1; clipNumber <= 3; clipNumber++) {
+                const container = document.getElementById(`methods-container-${clipNumber}`);
+                const clipMethods = analysisMethodsByClip[clipNumber - 1];
+                clipMethods.forEach(method => {
+                    container.appendChild(generateMethodHTML(method, clipNumber));
+                });
+            }
+        }
+
+        // Load analysis content
+        async function loadAnalysisContent() {
+            try {
+                for (let clipIndex = 0; clipIndex < 3; clipIndex++) {
+                    const clipMethods = analysisMethodsByClip[clipIndex];
+                    for (let methodIndex = 0; methodIndex < clipMethods.length; methodIndex++) {
+                        const method = clipMethods[methodIndex];
+                        
+                        if (method.type === 'text') {
+                            try {
+                                const response = await fetch(`short_study/${method.folder}/${method.files[clipIndex]}`);
+                                const text = await response.text();
+                                document.getElementById(`${method.id}-analysis-${clipIndex + 1}`).innerHTML = marked ? marked(text) : text.replace(/\n/g, '<br>');
+                            } catch (error) {
+                                console.error(`Error loading ${method.id} analysis ${clipIndex}:`, error);
+                                document.getElementById(`${method.id}-analysis-${clipIndex + 1}`).innerHTML = '<p>Analysis content loading...</p>';
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading analysis content:', error);
+            }
+        }
+
+        // Generate ranking interfaces
+        function generateRankingInterface(clipNumber) {
+            const container = document.getElementById(`ranking-dimensions-${clipNumber}`);
+            
+            dimensions.forEach(dim => {
+                const dimensionDiv = document.createElement('div');
+                dimensionDiv.className = 'dimension-ranking';
+                dimensionDiv.innerHTML = `
+                    <div class="dimension-title">${dim.label}</div>
+                    <div class="dimension-description">${dim.statement}</div>
+                    <div class="ranking-area" data-clip="${clipNumber}" data-dimension="${dim.id}">
+                        <div class="drop-zone" data-position="1">
+                            <span class="drop-zone-label">Best</span>
+                        </div>
+                        <div class="drop-zone" data-position="2">
+                            <span class="drop-zone-label">Middle</span>
+                        </div>
+                        <div class="drop-zone" data-position="3">
+                            <span class="drop-zone-label">Worst</span>
+                        </div>
+                    </div>
+                    <div class="ranking-labels">
+                        <span>Most Preferred</span>
+                        <span>Least Preferred</span>
+                    </div>
+                    <div class="method-cards" style="margin-top: 15px; text-align: center;">
+                        ${analysisMethodsByClip[clipNumber - 1].map(method => 
+                            `<div class="method-card" draggable="true" data-method="${method.label}">Method ${method.label}</div>`
+                        ).join('')}
+                    </div>
+                `;
+                container.appendChild(dimensionDiv);
+            });
+
+            // Add drag and drop functionality
+            setupDragAndDrop(clipNumber);
+        }
+
+        function setupDragAndDrop(clipNumber) {
+            const container = document.getElementById(`ranking-dimensions-${clipNumber}`);
+            
+            // Add event listeners to method cards
+            container.querySelectorAll('.method-card').forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Add event listeners to drop zones
+            container.querySelectorAll('.drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+        }
+
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', '');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            e.target.closest('.drop-zone').classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.target.closest('.drop-zone').classList.remove('drag-over');
+        }
+
+        // Load saved results from localStorage if they exist
+        function loadSavedResults() {
+            const saved = localStorage.getItem('shortStudyResults_v2');
+            if (saved) {
+                studyResults = JSON.parse(saved);
+                
+                // Restore visual state for completed rankings
+                for (let clipNum = 1; clipNum <= 3; clipNum++) {
+                    if (studyResults.clips[clipNum - 1].rankings) {
+                        setTimeout(() => {
+                            restoreRankingVisuals(clipNum);
+                            checkCompletion(clipNum);
+                        }, 500); // Allow time for interface generation
+                    }
+                }
+            }
+        }
+
+        function restoreRankingVisuals(clipNumber) {
+            const clipData = studyResults.clips[clipNumber - 1];
+            if (!clipData.rankings) return;
+
+            dimensions.forEach(dim => {
+                const ranking = clipData.rankings[dim.id];
+                if (ranking && Object.keys(ranking).length === 3) {
+                    const rankingArea = document.querySelector(`[data-clip="${clipNumber}"][data-dimension="${dim.id}"]`);
+                    if (rankingArea) {
+                        // Clear existing cards from method-cards container
+                        const methodCardsContainer = rankingArea.closest('.dimension-ranking').querySelector('.method-cards');
+                        methodCardsContainer.innerHTML = '';
+
+                        // Place cards in their ranked positions
+                        for (let pos = 1; pos <= 3; pos++) {
+                            const method = ranking[pos];
+                            if (method) {
+                                const dropZone = rankingArea.querySelector(`[data-position="${pos}"]`);
+                                const methodCard = document.createElement('div');
+                                methodCard.className = 'method-card';
+                                methodCard.draggable = true;
+                                methodCard.dataset.method = method;
+                                methodCard.textContent = `Method ${method}`;
+                                methodCard.addEventListener('dragstart', handleDragStart);
+                                methodCard.addEventListener('dragend', handleDragEnd);
+                                dropZone.innerHTML = '';
+                                dropZone.appendChild(methodCard);
+                            }
+                        }
+
+                        // Add remaining unranked cards back to method-cards
+                        const usedMethods = Object.values(ranking);
+                        ['A', 'B', 'C'].forEach(method => {
+                            if (!usedMethods.includes(method)) {
+                                const methodCard = document.createElement('div');
+                                methodCard.className = 'method-card';
+                                methodCard.draggable = true;
+                                methodCard.dataset.method = method;
+                                methodCard.textContent = `Method ${method}`;
+                                methodCard.addEventListener('dragstart', handleDragStart);
+                                methodCard.addEventListener('dragend', handleDragEnd);
+                                methodCardsContainer.appendChild(methodCard);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+        function saveProgress() {
+            localStorage.setItem('shortStudyResults_v2', JSON.stringify(studyResults));
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropZone = e.target.closest('.drop-zone');
+            dropZone.classList.remove('drag-over');
+
+            if (draggedElement && dropZone) {
+                const rankingArea = dropZone.closest('.ranking-area');
+                const clipNum = parseInt(rankingArea.dataset.clip);
+                const dimension = rankingArea.dataset.dimension;
+                const targetPosition = parseInt(dropZone.dataset.position);
+                const draggedMethod = draggedElement.dataset.method;
+
+                // Check if dragged element is coming from another drop zone (for swapping)
+                const draggedFromDropZone = draggedElement.closest('.drop-zone');
+                
+                // Get existing card in target drop zone
+                const existingCard = dropZone.querySelector('.method-card');
+                
+                if (existingCard && draggedFromDropZone) {
+                    // DIRECT SWAP: Both cards are in drop zones
+                    const existingMethod = existingCard.dataset.method;
+                    const sourcePosition = parseInt(draggedFromDropZone.dataset.position);
+                    
+                    // Create new card for existing method in source position
+                    const swapCard = document.createElement('div');
+                    swapCard.className = 'method-card';
+                    swapCard.draggable = true;
+                    swapCard.dataset.method = existingMethod;
+                    swapCard.textContent = `Method ${existingMethod}`;
+                    swapCard.addEventListener('dragstart', handleDragStart);
+                    swapCard.addEventListener('dragend', handleDragEnd);
+                    
+                    // Clear both zones and place swapped cards
+                    draggedFromDropZone.innerHTML = '';
+                    draggedFromDropZone.appendChild(swapCard);
+                    
+                    dropZone.innerHTML = '';
+                    const newCard = document.createElement('div');
+                    newCard.className = 'method-card';
+                    newCard.draggable = true;
+                    newCard.dataset.method = draggedMethod;
+                    newCard.textContent = `Method ${draggedMethod}`;
+                    newCard.addEventListener('dragstart', handleDragStart);
+                    newCard.addEventListener('dragend', handleDragEnd);
+                    dropZone.appendChild(newCard);
+                    
+                    // Update study results for both positions
+                    if (!studyResults.clips[clipNum - 1].rankings) {
+                        studyResults.clips[clipNum - 1].rankings = {};
+                    }
+                    if (!studyResults.clips[clipNum - 1].rankings[dimension]) {
+                        studyResults.clips[clipNum - 1].rankings[dimension] = {};
+                    }
+                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = draggedMethod;
+                    studyResults.clips[clipNum - 1].rankings[dimension][sourcePosition] = existingMethod;
+                    
+                } else if (existingCard) {
+                    // REPLACE: Move existing card back to method-cards area
+                    const methodCardsContainer = dropZone.closest('.dimension-ranking').querySelector('.method-cards');
+                    const returnCard = document.createElement('div');
+                    returnCard.className = 'method-card';
+                    returnCard.draggable = true;
+                    returnCard.dataset.method = existingCard.dataset.method;
+                    returnCard.textContent = `Method ${existingCard.dataset.method}`;
+                    returnCard.addEventListener('dragstart', handleDragStart);
+                    returnCard.addEventListener('dragend', handleDragEnd);
+                    methodCardsContainer.appendChild(returnCard);
+                    
+                    // Place new card in drop zone
+                    dropZone.innerHTML = '';
+                    const newCard = document.createElement('div');
+                    newCard.className = 'method-card';
+                    newCard.draggable = true;
+                    newCard.dataset.method = draggedMethod;
+                    newCard.textContent = `Method ${draggedMethod}`;
+                    newCard.addEventListener('dragstart', handleDragStart);
+                    newCard.addEventListener('dragend', handleDragEnd);
+                    dropZone.appendChild(newCard);
+                    
+                    // Update study results
+                    if (!studyResults.clips[clipNum - 1].rankings) {
+                        studyResults.clips[clipNum - 1].rankings = {};
+                    }
+                    if (!studyResults.clips[clipNum - 1].rankings[dimension]) {
+                        studyResults.clips[clipNum - 1].rankings[dimension] = {};
+                    }
+                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = draggedMethod;
+                    
+                } else {
+                    // SIMPLE DROP: Empty drop zone
+                    dropZone.innerHTML = '';
+                    const newCard = document.createElement('div');
+                    newCard.className = 'method-card';
+                    newCard.draggable = true;
+                    newCard.dataset.method = draggedMethod;
+                    newCard.textContent = `Method ${draggedMethod}`;
+                    newCard.addEventListener('dragstart', handleDragStart);
+                    newCard.addEventListener('dragend', handleDragEnd);
+                    dropZone.appendChild(newCard);
+                    
+                    // Update study results
+                    if (!studyResults.clips[clipNum - 1].rankings) {
+                        studyResults.clips[clipNum - 1].rankings = {};
+                    }
+                    if (!studyResults.clips[clipNum - 1].rankings[dimension]) {
+                        studyResults.clips[clipNum - 1].rankings[dimension] = {};
+                    }
+                    studyResults.clips[clipNum - 1].rankings[dimension][targetPosition] = draggedMethod;
+                }
+
+                // Remove original dragged element if it's not from a drop zone
+                if (!draggedFromDropZone) {
+                    draggedElement.remove();
+                }
+
+                // Save progress immediately
+                saveProgress();
+                checkCompletion(clipNum);
+            }
+        }
+
+        function checkCompletion(clipNumber) {
+            let completedCount = 0;
+            const totalDimensions = dimensions.length;
+
+            if (studyResults.clips[clipNumber - 1].rankings) {
+                dimensions.forEach(dim => {
+                    const ranking = studyResults.clips[clipNumber - 1].rankings[dim.id];
+                    if (ranking && Object.keys(ranking).length === 3) {
+                        completedCount++;
+                    }
+                });
+            }
+
+            document.getElementById(`completion-count-${clipNumber}`).textContent = completedCount;
+            
+            if (completedCount === totalDimensions) {
+                document.getElementById(`continue-${clipNumber}`).disabled = false;
+                const statusElement = document.getElementById(`completion-${clipNumber}`);
+                statusElement.className = 'completion-status';
+                statusElement.innerHTML = '<p style="color: #27ae60;"><strong>✓ All rankings completed!</strong></p>';
+            }
+        }
+
+        function nextPhase() {
+            if (phases[currentPhase]) {
+                document.getElementById(phases[currentPhase]).classList.remove('active');
+            }
+            
+            currentPhase++;
+            
+            if (currentPhase < phases.length) {
+                document.getElementById(phases[currentPhase]).classList.add('active');
+                updateProgress();
+                
+                if (currentPhase >= 1 && currentPhase <= 3) {
+                    generateRankingInterface(currentPhase);
+                    // Restore saved state after interface is generated
+                    setTimeout(() => {
+                        restoreRankingVisuals(currentPhase);
+                    }, 100);
+                }
+            } else {
+                submitResults();
+            }
+        }
+
+        function previousPhase() {
+            if (currentPhase > 0) {
+                document.getElementById(phases[currentPhase]).classList.remove('active');
+                currentPhase--;
+                document.getElementById(phases[currentPhase]).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentPhase + 1) / phases.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function submitResults() {
+            // Prepare form data for Netlify
+            const form = document.querySelector('form[name="short-study-results"]');
+            form.querySelector('[name="timestamp"]').value = new Date().toISOString();
+            
+            // Populate individual ranking fields
+            for (let clipNum = 1; clipNum <= 3; clipNum++) {
+                dimensions.forEach(dim => {
+                    const ranking = studyResults.clips[clipNum - 1].rankings?.[dim.id];
+                    if (ranking) {
+                        // Convert position-based ranking to method order string
+                        const orderedMethods = [];
+                        for (let pos = 1; pos <= 3; pos++) {
+                            if (ranking[pos]) {
+                                orderedMethods.push(ranking[pos]);
+                            }
+                        }
+                        const rankingString = orderedMethods.join('>');
+                        form.querySelector(`[name="clip${clipNum}-${dim.id}-ranking"]`).value = rankingString;
+                    }
+                });
+            }
+            
+            form.querySelector('[name="results-json"]').value = JSON.stringify(studyResults, null, 2);
+            
+            // Store for Part 2
+            localStorage.setItem('shortStudyResults_v2', JSON.stringify(studyResults));
+            
+            // Submit to Netlify
+            const formData = new FormData(form);
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            }).then(() => {
+                console.log('Short study submitted successfully');
+                window.location.href = 'comprehensive-study.html';
+            }).catch((error) => {
+                console.error('Error submitting short study:', error);
+                // Still proceed to next part even if submission fails
+                window.location.href = 'comprehensive-study.html';
+            });
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            generateAllMethods(); // Generate randomized method HTML first
+            loadAnalysisContent();
+            loadSavedResults(); // Load saved progress
+            updateProgress();
+        });
+    </script>
+</body>
+</html> 

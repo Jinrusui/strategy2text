@@ -19,6 +19,7 @@ class Trace(object):
         self.game_score = None
         self.length = 0
         self.states = []
+        self.trace_seed = None  # Store seed used for this trace
 
     def update(self, obs, r, done, infos, a, state_id):
         self.obs.append(obs)

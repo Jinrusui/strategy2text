@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 2: Comprehensive Environment Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .intro-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .video-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .main-video-container {
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .environment-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .main-video {
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .navigation-section {
+            background: #e8f4ff;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #4facfe;
+        }
+
+        .navigation-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .nav-slider {
+            width: 100%;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .slider-track {
+            height: 8px;
+            background: #dee2e6;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slider-progress {
+            height: 100%;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            top: -8px;
+            width: 24px;
+            height: 24px;
+            background: #4facfe;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .environment-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: 2px solid #4facfe;
+            background: white;
+            color: #4facfe;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover {
+            background: #4facfe;
+            color: white;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .analysis-sections {
+            margin: 40px 0;
+        }
+
+        .analysis-method {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            margin: 20px 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .method-header {
+            background: #4facfe;
+            color: white;
+            padding: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .method-content {
+            padding: 20px;
+        }
+
+        .analysis-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid #4facfe;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .highlight-navigation {
+            margin: 15px 0;
+        }
+
+        .highlight-video-container {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .highlight-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .main-highlight-video {
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .highlight-nav-section {
+            background: #e8f4ff;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .highlight-nav-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .highlight-slider {
+            margin: 15px 0;
+        }
+
+        .highlight-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .highlight-nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .rating-section {
+            background: #e8f5e8;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #27ae60;
+        }
+
+        .rating-title {
+            color: #27ae60;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .rating-description {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .comprehensive-rating {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #27ae60;
+        }
+
+        .rating-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .method-rating {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .method-rating.completed {
+            border-color: #27ae60;
+            background: #e8f5e8;
+        }
+
+        .method-rating h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            font-size: 1.1em;
+        }
+
+        .rating-question {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .rating-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .rating-options label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 12px 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 60px;
+            flex: 1;
+            font-size: 0.9em;
+        }
+
+        .rating-options label:hover {
+            background: #e8f4ff;
+            transform: translateY(-2px);
+        }
+
+        .rating-options input[type="radio"] {
+            margin-bottom: 8px;
+            transform: scale(1.3);
+        }
+
+        .completion-section {
+            background: #fff3cd;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #ffc107;
+            text-align: center;
+        }
+
+        .completion-section.complete {
+            background: #d4edda;
+            border-color: #27ae60;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .nav-button {
+            padding: 15px 30px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-indicator {
+            text-align: center;
+            margin: 20px 0;
+            color: #4facfe;
+            font-weight: bold;
+        }
+
+        .browse-note {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+            font-style: italic;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Part 2: Comprehensive Environment Analysis</h1>
+            <p>Evaluating AI analysis methods across multiple environments</p>
+            <div class="progress-indicator">Part 2 of 2</div>
+        </div>
+
+        <div class="content">
+            <div class="intro-section">
+                <div style="font-size: 1.8em; font-weight: 600; color: #2c3e50; margin-bottom: 15px;">Comprehensive Analysis Task</div>
+                <div style="font-size: 1.1em; color: #34495e; line-height: 1.6;">
+                    <p><strong>Welcome to Part 2!</strong> You'll now see five different 30-second gameplay clips from various environments. Below them are three comprehensive analysis methods that integrate information from <strong>all five environments</strong>.</p>
+                    <p><strong>Your task:</strong> Browse through all five video clips, review each analysis method, then rate how useful each method is overall for understanding the AI's behavior across different contexts.</p>
+                    <p><strong>Rating:</strong> You'll give <strong>one rating per method</strong> (not per environment) based on their overall effectiveness.</p>
+                </div>
+            </div>
+
+            <div class="video-section">
+                <div class="main-video-container">
+                    <div class="environment-title" id="current-environment-title">Environment 1: Seed 42</div>
+                    <video class="main-video" id="main-video" controls>
+                        <source id="video-source" src="comprehensive_study/original_videos/seed42_30s-60s.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <div class="navigation-section">
+                    <div class="navigation-title">Browse All Five Environments</div>
+                    <div class="browse-note">
+                        <p>Use the slider or buttons below to browse through all five different game environments. Each shows the AI facing different challenges and scenarios.</p>
+                    </div>
+                    <div class="nav-slider" id="environment-slider">
+                        <div class="slider-track" onclick="setEnvironmentFromClick(event)">
+                            <div class="slider-progress" id="slider-progress"></div>
+                            <div class="slider-thumb" id="slider-thumb"></div>
+                        </div>
+                        <div class="environment-labels">
+                            <span>Env 1 (Seed 42)</span>
+                            <span>Env 2 (Seed 76)</span>
+                            <span>Env 3 (Seed 100)</span>
+                            <span>Env 4 (Seed 420)</span>
+                            <span>Env 5 (Seed 760)</span>
+                        </div>
+                    </div>
+                    <div class="nav-buttons">
+                        <button class="nav-btn" onclick="previousEnvironment()" id="prev-btn">← Previous</button>
+                        <button class="nav-btn" onclick="nextEnvironment()" id="next-btn">Next →</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-sections" id="analysis-sections">
+                <!-- Methods will be dynamically generated -->
+            </div>
+
+            <div class="rating-section">
+                <div class="rating-title">Rate Each Method's Overall Usefulness</div>
+                <div class="rating-description">
+                    After browsing the five environments and reviewing each analysis method, please rate how useful each method is overall for understanding the AI's behavior across different contexts.
+                </div>
+                
+                <div class="comprehensive-rating">
+                    <div class="rating-grid" id="rating-grid">
+                        <!-- Rating sections will be generated -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="completion-section" id="completion-status">
+                <p><strong>Please rate all three methods before submitting.</strong></p>
+                <p>Progress: <span id="completion-count">0</span> / 3 methods rated</p>
+            </div>
+
+            <div class="button-container">
+                <button class="nav-button back-btn" onclick="goBack()">Back to Part 1</button>
+                <button class="nav-button submit-btn" onclick="submitStudy()" id="submit-btn" disabled>Submit Study</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden form for Netlify - Combined Study Results -->
+    <form name="study-results-combined" method="POST" data-netlify="true" style="display: none;">
+        <input type="hidden" name="form-name" value="study-results-combined" />
+        <input type="hidden" name="study-version" />
+        <input type="hidden" name="timestamp" />
+        
+        <!-- Short Study Rankings -->
+        <input type="hidden" name="clip1-clarity-ranking" />
+        <input type="hidden" name="clip1-understandable-ranking" />
+        <input type="hidden" name="clip1-completeness-ranking" />
+        <input type="hidden" name="clip1-satisfaction-ranking" />
+        <input type="hidden" name="clip1-useful-ranking" />
+        <input type="hidden" name="clip1-accuracy-ranking" />
+        <input type="hidden" name="clip1-improvement-ranking" />
+        <input type="hidden" name="clip1-preference-ranking" />
+        <input type="hidden" name="clip2-clarity-ranking" />
+        <input type="hidden" name="clip2-understandable-ranking" />
+        <input type="hidden" name="clip2-completeness-ranking" />
+        <input type="hidden" name="clip2-satisfaction-ranking" />
+        <input type="hidden" name="clip2-useful-ranking" />
+        <input type="hidden" name="clip2-accuracy-ranking" />
+        <input type="hidden" name="clip2-improvement-ranking" />
+        <input type="hidden" name="clip2-preference-ranking" />
+        <input type="hidden" name="clip3-clarity-ranking" />
+        <input type="hidden" name="clip3-understandable-ranking" />
+        <input type="hidden" name="clip3-completeness-ranking" />
+        <input type="hidden" name="clip3-satisfaction-ranking" />
+        <input type="hidden" name="clip3-useful-ranking" />
+        <input type="hidden" name="clip3-accuracy-ranking" />
+        <input type="hidden" name="clip3-improvement-ranking" />
+        <input type="hidden" name="clip3-preference-ranking" />
+        
+        <!-- Comprehensive Study Ratings -->
+        <input type="hidden" name="image-rating" />
+        <input type="hidden" name="video-rating" />
+        <input type="hidden" name="highlights-rating" />
+        
+        <!-- Combined JSON Results -->
+        <input type="hidden" name="combined-results" />
+    </form>
+
+    <script src="marked.min.js"></script>
+    <script>
+        // Scroll to top when page loads
+        window.addEventListener('load', function() {
+            window.scrollTo(0, 0);
+        });
+
+        let currentEnvironment = 0;
+        let currentHighlight = 0;
+        let comprehensiveResults = {
+            methodRatings: {},
+            timestamp: new Date().toISOString()
+        };
+
+        const environments = [
+            { id: 'seed42', name: 'Environment 1 (Seed 42)', video: 'seed42_30s-60s.mp4' },
+            { id: 'seed76', name: 'Environment 2 (Seed 76)', video: 'seed76_30s-60s.mp4' },
+            { id: 'seed100', name: 'Environment 3 (Seed 100)', video: 'seed100_30s-60s.mp4' },
+            { id: 'seed420', name: 'Environment 4 (Seed 420)', video: 'seed420_30s-60s.mp4' },
+            { id: 'seed760', name: 'Environment 5 (Seed 760)', video: 'seed760_30s-60s.mp4' }
+        ];
+
+        const highlights = [
+            { id: 'HL_1', name: 'Highlight 1', video: 'HL_1.mp4' },
+            { id: 'HL_2', name: 'Highlight 2', video: 'HL_2.mp4' },
+            { id: 'HL_3', name: 'Highlight 3', video: 'HL_3.mp4' },
+            { id: 'HL_4', name: 'Highlight 4', video: 'HL_4.mp4' }
+        ];
+
+        // Define analysis methods template
+        const methodsTemplate = [
+            { 
+                id: 'image', 
+                name: 'Comprehensive Image-Based Analysis', 
+                question: 'How useful is this comprehensive image analysis for understanding the AI\'s behavior patterns across different environments?',
+                contentFile: 'images_analysis.md',
+                folder: 'images_analysis',
+                description: 'This method analyzes key frames from <strong>all five environments</strong> to provide an integrated understanding of the AI\'s decision-making patterns and behavioral consistency across different scenarios.'
+            },
+            { 
+                id: 'video', 
+                name: 'Comprehensive Video-Based Analysis (HVA-X)', 
+                question: 'How useful is this strategic analysis for understanding the AI\'s gameplay approach and tactical patterns?',
+                contentFile: 'HVA-X.md',
+                folder: 'video_analysis',
+                description: 'This method provides a detailed strategic and tactical analysis of the AI\'s gameplay approach, synthesizing observations from <strong>multiple environments</strong> to create a complete behavioral profile.'
+            },
+            { 
+                id: 'highlights', 
+                name: 'Key Moment Highlights', 
+                question: 'How useful are these highlight videos for understanding the AI\'s most important behavioral moments?',
+                type: 'highlights',
+                description: 'These are algorithmically selected short clips that show the most important moments from across all environments, providing concrete examples of the AI\'s key behavioral patterns.'
+            }
+        ];
+
+        // Randomize method order
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Create randomized methods with labels 1, 2, 3
+        const methods = shuffleArray(methodsTemplate).map((method, index) => ({
+            ...method,
+            label: index + 1 // 1, 2, 3
+        }));
+
+        console.log('Randomized method order:', methods.map(m => `Method ${m.label}: ${m.name}`));
+
+        // Generate method HTML dynamically
+        function generateMethodHTML(method) {
+            const methodDiv = document.createElement('div');
+            methodDiv.className = 'analysis-method';
+            methodDiv.id = `${method.id}-method`;
+            
+            if (method.type === 'highlights') {
+                methodDiv.innerHTML = `
+                    <div class="method-header">Method ${method.label}: ${method.name}</div>
+                    <div class="method-content">
+                        <p><strong>What are Highlights?</strong> ${method.description}</p>
+                        <div class="highlight-navigation">
+                            <div class="highlight-video-container">
+                                <div class="highlight-title" id="current-highlight-title">Highlight 1</div>
+                                <video class="main-highlight-video" id="main-highlight-video" controls>
+                                    <source id="highlight-source" src="comprehensive_study/highlights/HL_1.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                            <div class="highlight-nav-section">
+                                <div class="highlight-nav-title">Browse Highlights</div>
+                                <div class="highlight-slider" id="highlight-slider">
+                                    <div class="slider-track" onclick="setHighlightFromClick(event)">
+                                        <div class="slider-progress" id="highlight-progress"></div>
+                                        <div class="slider-thumb" id="highlight-thumb"></div>
+                                    </div>
+                                    <div class="highlight-labels">
+                                        <span>HL 1</span>
+                                        <span>HL 2</span>
+                                        <span>HL 3</span>
+                                        <span>HL 4</span>
+                                    </div>
+                                </div>
+                                <div class="highlight-nav-buttons">
+                                    <button class="nav-btn" onclick="previousHighlight()" id="prev-highlight-btn">← Previous</button>
+                                    <button class="nav-btn" onclick="nextHighlight()" id="next-highlight-btn">Next →</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                methodDiv.innerHTML = `
+                    <div class="method-header">Method ${method.label}: ${method.name}</div>
+                    <div class="method-content">
+                        <p><strong>What is this analysis?</strong> ${method.description}</p>
+                        <div class="analysis-content" id="${method.id}-analysis-content">
+                            <!-- Content will be loaded from ${method.contentFile} -->
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return methodDiv;
+        }
+
+        // Generate all methods
+        function generateAllMethods() {
+            const container = document.getElementById('analysis-sections');
+            methods.forEach(method => {
+                container.appendChild(generateMethodHTML(method));
+            });
+        }
+
+        // Load comprehensive analysis content
+        async function loadComprehensiveAnalysis() {
+            try {
+                for (const method of methods) {
+                    if (method.type !== 'highlights') {
+                        try {
+                            const response = await fetch(`comprehensive_study/${method.folder}/${method.contentFile}`);
+                            const text = await response.text();
+                            document.getElementById(`${method.id}-analysis-content`).innerHTML = marked ? marked(text) : text.replace(/\n/g, '<br>');
+                        } catch (error) {
+                            console.error(`Error loading ${method.id} analysis:`, error);
+                            document.getElementById(`${method.id}-analysis-content`).innerHTML = '<p>Analysis content loading...</p>';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading comprehensive analysis:', error);
+            }
+        }
+
+        function updateEnvironment(envIndex) {
+            currentEnvironment = envIndex;
+            const env = environments[envIndex];
+            
+            // Update video
+            document.getElementById('video-source').src = `comprehensive_study/original_videos/${env.video}`;
+            document.getElementById('main-video').load();
+            
+            // Update title
+            document.getElementById('current-environment-title').textContent = env.name;
+            
+            // Update slider
+            updateSlider();
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = envIndex === 0;
+            document.getElementById('next-btn').disabled = envIndex === environments.length - 1;
+        }
+
+        function updateSlider() {
+            const progress = (currentEnvironment / (environments.length - 1)) * 100;
+            document.getElementById('slider-progress').style.width = progress + '%';
+            document.getElementById('slider-thumb').style.left = `calc(${progress}% - 12px)`;
+        }
+
+        function setEnvironmentFromClick(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            const envIndex = Math.round(percentage * (environments.length - 1));
+            updateEnvironment(Math.max(0, Math.min(environments.length - 1, envIndex)));
+        }
+
+        function previousEnvironment() {
+            if (currentEnvironment > 0) {
+                updateEnvironment(currentEnvironment - 1);
+            }
+        }
+
+        function nextEnvironment() {
+            if (currentEnvironment < environments.length - 1) {
+                updateEnvironment(currentEnvironment + 1);
+            }
+        }
+
+        // Highlight navigation functions
+        function updateHighlight(highlightIndex) {
+            currentHighlight = highlightIndex;
+            const highlight = highlights[highlightIndex];
+            
+            // Update video
+            document.getElementById('highlight-source').src = `comprehensive_study/highlights/${highlight.video}`;
+            document.getElementById('main-highlight-video').load();
+            
+            // Update title
+            document.getElementById('current-highlight-title').textContent = highlight.name;
+            
+            // Update slider
+            updateHighlightSlider();
+            
+            // Update navigation buttons
+            document.getElementById('prev-highlight-btn').disabled = highlightIndex === 0;
+            document.getElementById('next-highlight-btn').disabled = highlightIndex === highlights.length - 1;
+        }
+
+        function updateHighlightSlider() {
+            const progress = (currentHighlight / (highlights.length - 1)) * 100;
+            document.getElementById('highlight-progress').style.width = progress + '%';
+            document.getElementById('highlight-thumb').style.left = `calc(${progress}% - 12px)`;
+        }
+
+        function setHighlightFromClick(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const percentage = clickX / rect.width;
+            const highlightIndex = Math.round(percentage * (highlights.length - 1));
+            updateHighlight(Math.max(0, Math.min(highlights.length - 1, highlightIndex)));
+        }
+
+        function previousHighlight() {
+            if (currentHighlight > 0) {
+                updateHighlight(currentHighlight - 1);
+            }
+        }
+
+        function nextHighlight() {
+            if (currentHighlight < highlights.length - 1) {
+                updateHighlight(currentHighlight + 1);
+            }
+        }
+
+        function generateRatingGrid() {
+            const container = document.getElementById('rating-grid');
+            container.innerHTML = ''; // Clear existing content
+            
+            methods.forEach(method => {
+                const methodRating = document.createElement('div');
+                methodRating.className = 'method-rating';
+                
+                // Check if this method is already rated
+                const currentRating = comprehensiveResults.methodRatings[method.id];
+                if (currentRating) {
+                    methodRating.classList.add('completed');
+                }
+                
+                methodRating.innerHTML = `
+                    <h4>${method.name}</h4>
+                    <div class="rating-question">${method.question}</div>
+                    <div class="rating-options">
+                        <label>
+                            <input type="radio" name="${method.id}-rating" value="1" onchange="updateRating('${method.id}', 1)" ${currentRating === 1 ? 'checked' : ''}>
+                            <span>Useless</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="${method.id}-rating" value="2" onchange="updateRating('${method.id}', 2)" ${currentRating === 2 ? 'checked' : ''}>
+                            <span>Unsure</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="${method.id}-rating" value="3" onchange="updateRating('${method.id}', 3)" ${currentRating === 3 ? 'checked' : ''}>
+                            <span>Useful</span>
+                        </label>
+                    </div>
+                `;
+                container.appendChild(methodRating);
+            });
+        }
+
+        function updateRating(methodId, value) {
+            comprehensiveResults.methodRatings[methodId] = parseInt(value);
+            
+            // Save progress immediately
+            saveProgress();
+            
+            // Update visual feedback
+            const methodRating = document.querySelector(`input[name="${methodId}-rating"]:checked`).closest('.method-rating');
+            if (methodRating) {
+                methodRating.classList.add('completed');
+            }
+            
+            updateCompletionStatus();
+            
+            console.log('Rating updated:', methodId, value, comprehensiveResults.methodRatings);
+        }
+
+        function updateCompletionStatus() {
+            const completedCount = Object.keys(comprehensiveResults.methodRatings).length;
+            const totalRequired = methods.length;
+            
+            document.getElementById('completion-count').textContent = completedCount;
+            
+            const statusElement = document.getElementById('completion-status');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            if (completedCount === totalRequired) {
+                submitBtn.disabled = false;
+                statusElement.className = 'completion-section complete';
+                statusElement.innerHTML = `
+                    <p style="color: #27ae60;"><strong>✓ All methods rated!</strong></p>
+                    <p>You have rated all ${totalRequired} analysis methods.</p>
+                    <p>You can now submit the study.</p>
+                `;
+            } else {
+                submitBtn.disabled = true;
+                statusElement.className = 'completion-section';
+                statusElement.innerHTML = `
+                    <p><strong>Please rate all three methods before submitting.</strong></p>
+                    <p>Progress: <span>${completedCount}</span> / ${totalRequired} methods rated</p>
+                `;
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('comprehensiveStudyResults_v2', JSON.stringify(comprehensiveResults));
+        }
+
+        function loadSavedResults() {
+            const saved = localStorage.getItem('comprehensiveStudyResults_v2');
+            if (saved) {
+                try {
+                    comprehensiveResults = JSON.parse(saved);
+                    console.log('Loaded saved results:', comprehensiveResults);
+                    // Regenerate the rating grid to reflect saved selections
+                    setTimeout(() => {
+                        generateRatingGrid();
+                        updateCompletionStatus();
+                    }, 100);
+                } catch (error) {
+                    console.error('Error loading saved results:', error);
+                }
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'short-study.html';
+        }
+
+        function submitStudy() {
+            // Check if already submitted
+            const hasSubmitted = localStorage.getItem('studySubmitted_v2');
+            if (hasSubmitted) {
+                alert('This study has already been submitted and cannot be submitted again.');
+                return;
+            }
+
+            // Disable submit button immediately to prevent double submission
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            // Get short study results from localStorage
+            const shortStudyResults = JSON.parse(localStorage.getItem('shortStudyResults_v2') || '{}');
+            
+            // Combine both parts
+            const combinedResults = {
+                shortStudy: shortStudyResults,
+                comprehensiveStudy: comprehensiveResults,
+                completionTimestamp: new Date().toISOString(),
+                studyVersion: 'v2'
+            };
+
+            // Prepare form data for Netlify - single combined form
+            const form = document.querySelector('form[name="study-results-combined"]');
+            form.querySelector('[name="timestamp"]').value = new Date().toISOString();
+            form.querySelector('[name="study-version"]').value = 'v2';
+            form.querySelector('[name="combined-results"]').value = JSON.stringify(combinedResults, null, 2);
+            
+            // Populate short study ranking fields
+            if (shortStudyResults.clips) {
+                for (let clipNum = 1; clipNum <= 3; clipNum++) {
+                    const clipData = shortStudyResults.clips[clipNum - 1];
+                    if (clipData && clipData.rankings) {
+                        ['clarity', 'understandable', 'completeness', 'satisfaction', 'useful', 'accuracy', 'improvement', 'preference'].forEach(dim => {
+                            const ranking = clipData.rankings[dim];
+                            if (ranking) {
+                                const orderedMethods = [];
+                                for (let pos = 1; pos <= 3; pos++) {
+                                    if (ranking[pos]) orderedMethods.push(ranking[pos]);
+                                }
+                                if (orderedMethods.length === 3) {
+                                    form.querySelector(`[name="clip${clipNum}-${dim}-ranking"]`).value = orderedMethods.join('>');
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // Populate comprehensive study rating fields
+            methods.forEach(method => {
+                const rating = comprehensiveResults.methodRatings[method.id];
+                if (rating) {
+                    form.querySelector(`[name="${method.id}-rating"]`).value = rating;
+                }
+            });
+
+            // Submit to Netlify
+            const formData = new FormData(form);
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            }).then(() => {
+                console.log('Study submitted successfully');
+                // Mark as submitted
+                localStorage.setItem('studySubmitted_v2', 'true');
+                showCompletionPage(combinedResults);
+            }).catch((error) => {
+                console.error('Error submitting study:', error);
+                // Re-enable button on error
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Study';
+                alert('There was an error submitting your study. Please try again.');
+            });
+        }
+
+        function showCompletionPage(results) {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div class="header">
+                    <h1>Study Complete!</h1>
+                    <p>Thank you for your participation</p>
+                </div>
+                <div class="content">
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="background: #d4edda; padding: 30px; border-radius: 15px; border-left: 5px solid #27ae60; margin: 30px 0;">
+                            <h2 style="color: #27ae60; margin-bottom: 20px;">✓ Results Submitted Successfully!</h2>
+                            <p>Your responses have been recorded and will help improve AI explanation systems.</p>
+                            <p>You completed both parts of the study:</p>
+                            <ul style="text-align: left; max-width: 600px; margin: 20px auto;">
+                                <li><strong>Part 1:</strong> Short clip analysis with method ranking across 8 dimensions for 3 clips</li>
+                                <li><strong>Part 2:</strong> Comprehensive analysis with overall usefulness ratings for 3 methods</li>
+                            </ul>
+                            <div style="background: #fff3cd; padding: 20px; border-radius: 10px; border-left: 4px solid #ffc107; margin: 20px 0;">
+                                <p style="color: #856404; font-weight: bold; margin-bottom: 10px;">⚠️ Important Notice</p>
+                                <p style="color: #856404;">Your study has been successfully submitted and <strong>cannot be submitted again</strong>. The submit button has been permanently disabled for this session.</p>
+                            </div>
+                        </div>
+                        <button class="nav-button submit-btn" onclick="downloadResults()" style="margin: 20px;">
+                            Download Results (JSON)
+                        </button>
+                        <p style="color: #666; margin-top: 20px;">Thank you for contributing to our research!</p>
+                    </div>
+                </div>
+            `;
+
+            // Store final results
+            localStorage.setItem('finalStudyResults', JSON.stringify(results));
+        }
+
+        function downloadResults() {
+            const results = JSON.parse(localStorage.getItem('finalStudyResults') || '{}');
+            const dataStr = JSON.stringify(results, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `study_results_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        // Initialize
+        window.addEventListener('load', async () => {
+            generateAllMethods(); // Generate randomized method HTML first
+            await loadComprehensiveAnalysis();
+            updateEnvironment(0);
+            updateHighlight(0); // Initialize highlight navigation
+            loadSavedResults(); // Load saved results after environment is set
+            // Generate rating grid if no saved results were loaded
+            if (Object.keys(comprehensiveResults.methodRatings).length === 0) {
+                generateRatingGrid();
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -40,6 +40,11 @@ def run_phase2b_only(phase2a_file: str, output_prefix: str = "phase2b_analysis")
         with open(phase2a_file, 'r') as f:
             phase2a_results = json.load(f)
         
+        # Check if Phase 2A was run in direct mode
+        direct_mode = phase2a_results.get("input_data", {}).get("direct_mode", False)
+        if direct_mode:
+            logging.info("📊 Phase 2A was run in direct mode - continuing in direct mode")
+        
         # Extract successful event detections from Phase 2A
         successful_detections = {}
         failed_detections = {}
@@ -67,12 +72,13 @@ def run_phase2b_only(phase2a_file: str, output_prefix: str = "phase2b_analysis")
             # Return empty results structure
             return {
                 "algorithm": "HVA-X",
-                "phase": "Phase 2B - Guided Analysis",
+                "phase": "Phase 2B - Guided Analysis (Direct Mode)" if direct_mode else "Phase 2B - Guided Analysis",
                 "timestamp": datetime.now().isoformat(),
                 "input_data": {
                     "phase2a_file": phase2a_file,
                     "total_successful_detections": 0,
-                    "total_failed_detections": total_failed
+                    "total_failed_detections": total_failed,
+                    "direct_mode": direct_mode
                 },
                 "analysis_results": {
                     "successful_analyses": 0,
@@ -84,13 +90,17 @@ def run_phase2b_only(phase2a_file: str, output_prefix: str = "phase2b_analysis")
             }
         
         # Run Phase 2B: Guided Analysis
-        logging.info("🔄 Running Phase 2B: Guided Analysis")
+        if direct_mode:
+            logging.info("🔄 Running Phase 2B: Guided Analysis (Direct Mode)")
+        else:
+            logging.info("🔄 Running Phase 2B: Guided Analysis")
         
         with GeminiClient() as gemini_client:
             guided_analysis_results = {}
             
             for tier_name, tier_detections in successful_detections.items():
-                logging.info(f"  Processing {tier_name} tier ({len(tier_detections)} videos)")
+                tier_label = "videos" if direct_mode else "tier"
+                logging.info(f"  Processing {tier_name} {tier_label} ({len(tier_detections)} videos)")
                 tier_analyses = []
                 
                 for i, detection_result in enumerate(tier_detections):
@@ -145,12 +155,13 @@ def run_phase2b_only(phase2a_file: str, output_prefix: str = "phase2b_analysis")
         # Compile results
         results = {
             "algorithm": "HVA-X",
-            "phase": "Phase 2B - Guided Analysis",
+            "phase": "Phase 2B - Guided Analysis (Direct Mode)" if direct_mode else "Phase 2B - Guided Analysis",
             "timestamp": datetime.now().isoformat(),
             "input_data": {
                 "phase2a_file": phase2a_file,
                 "total_successful_detections": total_successful,
-                "total_failed_detections": total_failed
+                "total_failed_detections": total_failed,
+                "direct_mode": direct_mode
             },
             "analysis_results": {
                 "successful_analyses": successful_analyses,
@@ -192,8 +203,13 @@ def print_phase2b_summary(results: Dict[str, Any]):
     Args:
         results: Phase 2B results dictionary
     """
+    direct_mode = results['input_data'].get('direct_mode', False)
+    
     print("\n" + "="*60)
-    print("🎯 HVA-X PHASE 2B COMPLETE")
+    if direct_mode:
+        print("🎯 HVA-X PHASE 2B COMPLETE (DIRECT MODE)")
+    else:
+        print("🎯 HVA-X PHASE 2B COMPLETE")
     print("="*60)
     
     print(f"📊 Total videos processed: {results['input_data']['total_successful_detections']}")
@@ -209,25 +225,46 @@ def print_phase2b_summary(results: Dict[str, Any]):
         print(f"   - Ensure Phase 2A completed successfully before running Phase 2B")
         return
     
-    print(f"\n🔍 Guided Analysis by Tier:")
-    for tier_name, tier_analyses in results['guided_analysis_results'].items():
-        successful = [a for a in tier_analyses if "guided_analysis" in a]
-        failed = [a for a in tier_analyses if "error" in a]
-        
-        print(f"   {tier_name.replace('_', ' ').title()}: {len(tier_analyses)} videos")
-        print(f"     ✅ Successful: {len(successful)}")
-        print(f"     ❌ Failed: {len(failed)}")
-        
-        if successful:
-            total_length = sum(a["analysis_length"] for a in successful)
-            avg_length = total_length / len(successful)
-            print(f"     📊 Total analysis text: {total_length:,} characters")
-            print(f"     📊 Average analysis length: {avg_length:,.0f} characters")
+    if direct_mode:
+        print(f"\n🔍 Guided Analysis (Direct Mode):")
+        for tier_name, tier_analyses in results['guided_analysis_results'].items():
+            successful = [a for a in tier_analyses if "guided_analysis" in a]
+            failed = [a for a in tier_analyses if "error" in a]
             
-            # Show sample analysis preview from first successful video
-            sample_analysis = successful[0]["guided_analysis"][:200] + "..."
-            print(f"     📋 Sample analysis from {successful[0]['trajectory']['episode_id']}:")
-            print(f"       {sample_analysis}")
+            print(f"   {tier_name.replace('_', ' ').title()}: {len(tier_analyses)} videos")
+            print(f"     ✅ Successful: {len(successful)}")
+            print(f"     ❌ Failed: {len(failed)}")
+            
+            if successful:
+                total_length = sum(a["analysis_length"] for a in successful)
+                avg_length = total_length / len(successful)
+                print(f"     📊 Total analysis text: {total_length:,} characters")
+                print(f"     📊 Average analysis length: {avg_length:,.0f} characters")
+                
+                # Show sample analysis preview from first successful video
+                sample_analysis = successful[0]["guided_analysis"][:200] + "..."
+                print(f"     📋 Sample analysis from {successful[0]['trajectory']['episode_id']}:")
+                print(f"       {sample_analysis}")
+    else:
+        print(f"\n🔍 Guided Analysis by Tier:")
+        for tier_name, tier_analyses in results['guided_analysis_results'].items():
+            successful = [a for a in tier_analyses if "guided_analysis" in a]
+            failed = [a for a in tier_analyses if "error" in a]
+            
+            print(f"   {tier_name.replace('_', ' ').title()}: {len(tier_analyses)} videos")
+            print(f"     ✅ Successful: {len(successful)}")
+            print(f"     ❌ Failed: {len(failed)}")
+            
+            if successful:
+                total_length = sum(a["analysis_length"] for a in successful)
+                avg_length = total_length / len(successful)
+                print(f"     📊 Total analysis text: {total_length:,} characters")
+                print(f"     📊 Average analysis length: {avg_length:,.0f} characters")
+                
+                # Show sample analysis preview from first successful video
+                sample_analysis = successful[0]["guided_analysis"][:200] + "..."
+                print(f"     📋 Sample analysis from {successful[0]['trajectory']['episode_id']}:")
+                print(f"       {sample_analysis}")
     
     print(f"\n📋 Next Steps:")
     print(f"   - Use guided analyses for Phase 3 (Meta-Synthesis)")

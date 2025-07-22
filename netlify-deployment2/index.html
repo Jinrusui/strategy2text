@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis Comparison Study - Two-Part Design</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .start-button {
+            display: inline-block;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            margin: 30px 0;
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .info {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #4facfe;
+            text-align: left;
+        }
+        .study-parts {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #27ae60;
+            text-align: left;
+        }
+        .study-parts h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 14px;
+            color: #666;
+        }
+        .loading {
+            display: none;
+            margin: 20px 0;
+            color: #4facfe;
+        }
+        .part-description {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f0f7ff;
+            border-radius: 8px;
+            border-left: 3px solid #4facfe;
+        }
+        .part-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Analysis Comparison Study</h1>
+        
+        <div class="info">
+            <p><strong>Welcome!</strong> Thank you for participating in our research study about understanding AI behavior.</p>
+            <p>This study compares different AI analysis methods to see how effectively they help you understand a game-playing AI.</p>
+        </div>
+        
+        <div class="study-parts">
+            <h4>New Two-Part Study Design</h4>
+            <p>This study now consists of two parts designed to comprehensively evaluate different AI analysis methods:</p>
+            
+            <div class="part-description">
+                <div class="part-title">Part 1: Short Clip Analysis (~10 minutes)</div>
+                <p>You'll analyze short video clips using three different methods: image-based analysis, video-based analysis, and Grad-CAM visualization. For each clip, you'll rank the methods in order of preference and evaluate their effectiveness.</p>
+            </div>
+            
+            <div class="part-description">
+                <div class="part-title">Part 2: Comprehensive Environment Analysis (~10 minutes)</div>
+                <p>You'll analyze five different 30-second clips from various environments, evaluating image analysis, video analysis, and highlight methods. You'll rate each method's usefulness for understanding the AI's behavior in different contexts.</p>
+            </div>
+        </div>
+        
+        <button class="start-button" onclick="startStudy()" id="start-btn">
+            Start Study
+        </button>
+        
+        <div class="loading" id="loading">
+            <p>Preparing study materials...</p>
+        </div>
+        
+        <div class="info">
+            <p><strong>Instructions:</strong></p>
+            <p>• Please use a desktop or laptop computer for the best experience</p>
+            <p>• Make sure your audio is enabled for the video content</p>
+            <p>• You can pause, replay or adjust play speed while watching videos</p>
+            <p>• Focus on understanding the AI's behavior and strategy</p>
+            <p>• The study will take approximately 20 minutes total</p>
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for participating in our research!</p>
+        </div>
+    </div>
+
+    <script>
+        // Scroll to top when page loads
+        window.addEventListener('load', function() {
+            window.scrollTo(0, 0);
+        });
+
+        function startStudy() {
+            // Show loading message
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('start-btn').style.display = 'none';
+            
+            // Navigate to the first part of the study
+            setTimeout(() => {
+                window.location.href = 'short-study.html';
+            }, 1000);
+        }
+    </script>
+</body>
+</html> 

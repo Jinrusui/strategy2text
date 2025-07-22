@@ -25,10 +25,23 @@ def get_traces(environment, model, args):
     # Handle VecEnv vs regular env
     is_vec_env = isinstance(environment, VecEnv)
     
+    # Get trace seeds from args
+    trace_seeds = getattr(args, 'trace_seed_list', [args.seed] * args.n_traces)
+    deterministic_eval = getattr(args, 'deterministic_eval', True)
+    
+    if args.verbose:
+        print(f"Using trace seeds: {trace_seeds}")
+        print(f"Deterministic evaluation: {deterministic_eval}")
+    
     for i in range(args.n_traces):
-        get_single_trace(environment, model, i, execution_traces, states_dictionary, args, is_vec_env)
+        # Use specific seed for this trace
+        trace_seed = trace_seeds[i] if i < len(trace_seeds) else args.seed
+        
+        get_single_trace(environment, model, i, execution_traces, states_dictionary, 
+                        args, is_vec_env, trace_seed=trace_seed, 
+                        deterministic=deterministic_eval)
         if args.verbose: 
-            print(f"\tTrace {i} {15*'-'+'>'} Obtained")
+            print(f"\tTrace {i} (seed: {trace_seed}) {15*'-'+'>'} Obtained")
     
     if args.verbose: 
         print(f"Highlights {15*'-'+'>'} Traces & States Generated")
@@ -36,7 +49,8 @@ def get_traces(environment, model, args):
     return execution_traces, states_dictionary
 
 
-def get_single_trace(env, model, trace_idx, agent_traces, states_dict, args, is_vec_env=False):
+def get_single_trace(env, model, trace_idx, agent_traces, states_dict, args, is_vec_env=False, 
+                    trace_seed=None, deterministic=True):
     """
     Implement a single trace while using the Trace and State classes
     
@@ -48,7 +62,23 @@ def get_single_trace(env, model, trace_idx, agent_traces, states_dict, args, is_
         states_dict: Dictionary to store states
         args: Arguments
         is_vec_env: Whether environment is vectorized
+        trace_seed: Specific seed for this trace (for reproducible scenarios)
+        deterministic: Whether to use deterministic policy evaluation
     """
+    import numpy as np
+    from stable_baselines3.common.utils import set_random_seed
+    
+    # Set seed for this specific trace
+    if trace_seed is not None:
+        set_random_seed(trace_seed)
+        if is_vec_env:
+            env.seed(trace_seed)
+        else:
+            env.seed(trace_seed)
+            # Also seed the action space for stochastic environments
+            if hasattr(env, 'action_space') and hasattr(env.action_space, 'seed'):
+                env.action_space.seed(trace_seed)
+    
     trace = Trace()
     
     # Reset environment
@@ -66,11 +96,11 @@ def get_single_trace(env, model, trace_idx, agent_traces, states_dict, args, is_
     max_steps = getattr(args, 'max_steps_per_trace', 1000)  # Prevent infinite loops
     
     while not done and step_count < max_steps:
-        # Get action from model
+        # Get action from model (use deterministic parameter)
         if is_vec_env:
-            action, _ = model.predict(obs, deterministic=True)
+            action, _ = model.predict(obs, deterministic=deterministic)
         else:
-            action, _ = model.predict(obs.reshape(1, -1) if obs.ndim > 0 else obs, deterministic=True)
+            action, _ = model.predict(obs.reshape(1, -1) if obs.ndim > 0 else obs, deterministic=deterministic)
             if isinstance(action, np.ndarray) and action.size == 1:
                 action = action.item()
         
@@ -184,6 +214,9 @@ def get_single_trace(env, model, trace_idx, agent_traces, states_dict, args, is_
                 trace.game_score = episode_rewards[-1]
         except:
             pass
+    
+    # Store trace seed in trace object for reference
+    trace.trace_seed = trace_seed
     
     agent_traces.append(trace)
 

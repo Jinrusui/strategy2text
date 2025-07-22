@@ -78,8 +78,32 @@ def output_and_metadata(args):
     log_name = f'run_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}_{randint(100000, 900000)}'
     args.output_dir = join(abspath('highlights/results'), log_name)
     makedirs(args.output_dir)
+    
+    # Create metadata dictionary
+    metadata = vars(args).copy()
+    
+    # Add seeding information for reproducibility
+    if hasattr(args, 'save_seeds') and args.save_seeds:
+        metadata['seeding_info'] = {
+            'seed_mode': getattr(args, 'seed_mode', 'fixed'),
+            'base_seed': getattr(args, 'base_seed', args.seed),
+            'environment_seed': args.seed,
+            'trace_seeds': getattr(args, 'trace_seed_list', [args.seed] * args.n_traces),
+            'deterministic_eval': getattr(args, 'deterministic_eval', True),
+            'parsed_trace_seeds': getattr(args, 'parsed_trace_seeds', None)
+        }
+        
+        # Add reproduction instructions
+        metadata['reproduction_command'] = {
+            'description': 'Command to reproduce this exact run',
+            'base_command': f'python run.py --env {args.env} --algo {args.algo}',
+            'seed_args': f'--seed-mode {getattr(args, "seed_mode", "fixed")} --base-seed {getattr(args, "base_seed", args.seed)}',
+            'trace_args': f'--trace-seeds {",".join(map(str, getattr(args, "parsed_trace_seeds", [])))}' if getattr(args, 'parsed_trace_seeds', None) else '',
+            'other_args': f'--n-traces {args.n_traces} --num-highlights {getattr(args, "num_highlights", 5)} --trajectory-length {args.trajectory_length}'
+        }
+    
     with Path(join(args.output_dir, 'metadata.json')).open('w') as f:
-        json.dump(vars(args), f, sort_keys=True, indent=4)
+        json.dump(metadata, f, sort_keys=True, indent=4, default=str)
 
 
 def main(args):

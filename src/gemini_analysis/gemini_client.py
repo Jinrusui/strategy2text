@@ -130,40 +130,44 @@ Using the key moments above as focal points, provide a detailed analysis coverin
     def _get_meta_synthesis_prompt(self) -> str:
         """Get the meta-synthesis prompt for Phase 3 of HVA-X."""
         return """
-You are a lead RL analyst synthesizing multiple gameplay analyses to create a comprehensive agent evaluation report.
+You are a lead RL analyst synthesizing multiple gameplay analyses that include **events with time spans** to create a cohesive, time-aligned agent evaluation report.
 
 **ANALYSIS DATA:**
 {all_summaries}
 
-Your task is to synthesize these individual analyses into a cohesive, high-level report.
+Your task is to synthesize these individual analyses into a cohesive, high-level report, **highlighting key behavioral patterns, successes, or failure modes within specific time spans.** This allows the reader to map insights directly to real-time video segments.
 
-## Synthesis Framework
+## Synthesis Framework (Time-Aligned)
 
 ### 1. Differentiators of Performance
-- What specific strategies, paddle techniques, or behaviors separate high-scoring episodes from low-scoring ones?
-- Is there a correlation between quantitative metrics (like miss rate) and the final score tier?
-- What are the most common failure modes observed in the low-performing episodes?
+
+* Identify specific strategies, paddle techniques, or behaviors that separate high-scoring episodes from low-scoring ones.
+* Correlate quantitative metrics (e.g., miss rate, score delta) with final performance tiers.
+* Highlight **common failure modes** and **notable turning points**, referencing the **time spans** they occurred in.
 
 ### 2. Agent Competence Profile
-- **Core Strategy:** What is the agent's most common brick-clearing strategy across all episodes?
-- **Tactical Skill:** What is the agent's general level of paddle skill? Does it consistently demonstrate advanced techniques like angle control, or does it primarily play reactively?
-- **Key Strengths:** What are its most reliable strengths (e.g., consistent defense, effective tunneling)?
-- **Key Weaknesses:** What are its most common weaknesses (e.g., handling high speeds, sharp-angle shots)?
 
-### 3. Overall Consistency & Reliability
-- How consistent is the agent's performance across the entire sample set?
-- Does the agent's skill (e.g., paddle control, responsiveness) appear uniform, or does it vary significantly between games?
+* **Core Strategy:** Describe the agent's dominant brick-clearing strategy across episodes.
+* **Tactical Skill:** Assess paddle control—does the agent apply angle control or play reactively?
+* **Strengths & Weaknesses:** Pinpoint consistent strengths (e.g., wall tunneling, multi-ball defense) and weaknesses (e.g., speed tracking, edge bounces), aligned with **time-based patterns**.
 
-## Final Report Format
+### 3. Time-Based Consistency & Reliability
 
-Provide a comprehensive report structured as:
-1.  **Executive Summary** (A 3-sentence overview of the agent's profile, skill, and consistency).
-2.  **Detailed Strategic Profile** (Analysis of its core strategies and decision-making).
-3.  **Tactical Skill Assessment** (Evaluation of its paddle control, responsiveness, and striking techniques).
-4.  **Performance Analysis** (Patterns and key differentiators across performance tiers).
-5.  **Conclusion & Recommendations** (Overall assessment and potential areas for improvement).
+* How consistent is the agent’s behavior over time?
+* Are there **recurrent time windows** where performance degrades or improves (e.g., minute 15-18s often marks a drop in paddle accuracy)? 
+* Identify **critical time spans** showing performance volatility or reliability.
 
-Focus on insights that emerge from comparing multiple episodes. Contrast the different performance tiers to build a complete picture of the agent's capabilities.
+## Final Report Format (≤ 350 words)
+
+Structure your report with these sections:
+
+1. **Executive Summary** (3 sentences summarizing skill, consistency, and behavioral trends with reference to time spans).
+2. **Detailed Strategic Profile** (Analysis of core strategy, with time-based highlights).
+3. **Tactical Skill Assessment** (Paddle control and reaction quality, linked to specific spans).
+4. **Performance Analysis** (Key patterns, risk moments, and high/low performance time spans).
+5. **Conclusion & Recommendations** (Summary assessment and improvement areas with referenced time spans).
+
+Keep the report under 350 words and prioritize **time-based insights** that let users link findings to exact video segments.
 """
 
     def _wait_for_file_active(self, uploaded_file: Any, max_wait_time: int = 120) -> None:

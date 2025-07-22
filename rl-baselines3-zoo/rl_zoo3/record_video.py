@@ -16,7 +16,7 @@ if __name__ == "__main__":
     parser.add_argument("--env", help="Environment ID", type=EnvironmentName, default="BreakoutNoFrameskip-v4")
     parser.add_argument("-f", "--folder", help="Log folder", type=str, default="rl-trained-agents")
     parser.add_argument("-o", "--output-folder", help="Output folder", type=str)
-    parser.add_argument("--algo", help="RL Algorithm", default="ppo", type=str, required=False, choices=list(ALGOS.keys()))
+    parser.add_argument("--algo", help="RL Algorithm", default="dqn", type=str, required=False, choices=list(ALGOS.keys()))
     parser.add_argument("-n", "--n-timesteps", help="Number of timesteps", default=1000, type=int)
     parser.add_argument("--n-envs", help="Number of environments", default=1, type=int)
     parser.add_argument("--deterministic", action="store_true", default=False, help="Use deterministic actions")
@@ -133,6 +133,10 @@ if __name__ == "__main__":
     # Deterministic by default except for atari games
     stochastic = args.stochastic or ((is_atari or is_minigrid) and not args.deterministic)
     deterministic = not stochastic
+    
+    print(f"Using deterministic={deterministic}, stochastic={stochastic}")
+    print(f"Environment: {env_name}, Algorithm: {algo}")
+    print(f"Random seed: {seed}")
 
     if video_folder is None:
         video_folder = os.path.join(log_path, "videos")
@@ -149,18 +153,42 @@ if __name__ == "__main__":
     obs = env.reset()
     lstm_states = None
     episode_starts = np.ones((env.num_envs,), dtype=bool)
+    
+    print(f"\nStarting video recording for {video_length} timesteps...")
+    print(f"Initial observation shape: {obs.shape}")
+    print(f"Observation dtype: {obs.dtype}")
+    print(f"Observation range: [{obs.min():.3f}, {obs.max():.3f}]")
+    
     try:
         total_reward = 0
-        for _ in range(video_length):
+        step_count = 0
+        for step_idx in range(video_length):
             action, lstm_states = model.predict(
                 obs,  # type: ignore[arg-type]
                 state=lstm_states,
                 episode_start=episode_starts,
                 deterministic=deterministic,
             )
+            
+            # Log detailed step information
+            print(f"Step {step_idx:4d}: Action={action[0]:2d}, Episode_start={episode_starts[0]}", end="")
+            
             if not args.no_render:
                 env.render()
             obs, rewards, dones, infos = env.step(action)  # type: ignore[assignment]
+            
+            # Continue logging after environment step
+            total_reward += rewards[0]
+            step_count += 1
+            print(f", Reward={rewards[0]:6.2f}, Done={dones[0]}, Total_reward={total_reward:8.2f}")
+            
+            # Log additional info when episode ends
+            if dones[0]:
+                print(f"  --> Episode ended at step {step_idx}, Episode reward: {total_reward:.2f}")
+                if 'episode' in infos[0]:
+                    episode_info = infos[0]['episode']
+                    print(f"      Episode length: {episode_info.get('l', 'N/A')}, Episode reward: {episode_info.get('r', 'N/A')}")
+            
             episode_starts = dones
     except KeyboardInterrupt:
         pass
