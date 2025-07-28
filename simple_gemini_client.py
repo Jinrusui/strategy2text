@@ -8,6 +8,9 @@ import logging
 from typing import Optional, List
 from pathlib import Path
 import time
+import io
+import numpy as np
+from PIL import Image
 
 try:
     import google.generativeai as genai
@@ -30,9 +33,9 @@ class SimpleGeminiClient:
         
         self.api_key = (
             api_key or 
+            self._read_key_from_file("GEMINI_API_KEY.txt") or
             os.getenv("GEMINI_API_KEY") or 
-            os.getenv("GOOGLE_API_KEY") or 
-            self._read_key_from_file("Gemini_API_KEY.txt")
+            os.getenv("GOOGLE_API_KEY")
         )
         if not self.api_key:
             raise ValueError(
@@ -120,6 +123,63 @@ class SimpleGeminiClient:
         
         raise Exception("Analysis failed after all retries")
     
+    def analyze_image_data_with_prompt(self, images_data: List[np.ndarray], prompt: str, max_retries: int = 3) -> str:
+        """
+        Analyze a batch of in-memory image data (NumPy arrays) with a given prompt.
+        
+        Args:
+            images_data: List of images as NumPy arrays
+            prompt: Analysis prompt
+            max_retries: Maximum number of retry attempts
+            
+        Returns:
+            Analysis result as text
+        """
+        self.logger.info(f"Analyzing {len(images_data)} image arrays with prompt")
+        
+        for attempt in range(max_retries):
+            try:
+                # Prepare content
+                content = []
+                for img_array in images_data:
+                    # Encode numpy array to PNG bytes
+                    with io.BytesIO() as output:
+                        Image.fromarray(img_array).save(output, format="PNG")
+                        png_data = output.getvalue()
+                    
+                    image_part = {
+                        'mime_type': 'image/png',
+                        'data': png_data
+                    }
+                    content.append(image_part)
+                
+                # Add prompt to content
+                content.append(prompt)
+                
+                # Generate analysis
+                self.logger.info(f"Generating analysis (attempt {attempt + 1})")
+                response = self.model.generate_content(
+                    content,
+                    safety_settings=self.safety_settings
+                )
+                
+                if response and response.text:
+                    self.logger.info("Analysis completed successfully")
+                    return response.text.strip()
+                else:
+                    raise ValueError("Empty response from Gemini")
+                    
+            except Exception as e:
+                self.logger.warning(f"Analysis attempt {attempt + 1} failed: {str(e)}")
+                if attempt == max_retries - 1:
+                    self.logger.error(f"All {max_retries} attempts failed")
+                    raise
+                
+                # Wait before retry
+                time.sleep(2 ** attempt)
+        
+        raise Exception("Analysis failed after all retries")
+
     def analyze_text_with_prompt(self, text: str, prompt: str, max_retries: int = 3) -> str:
         """
         Analyze text with a given prompt (for synthesis).

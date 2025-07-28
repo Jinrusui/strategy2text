@@ -49,7 +49,8 @@ def run_phase3_only(phase2b_file: str, output_prefix: str = "phase3_synthesis") 
             
             for analysis_result in tier_analyses:
                 if "guided_analysis" in analysis_result:
-                    successful_analyses[tier_name].append(analysis_result["guided_analysis"])
+                    # Pass complete analysis data including trajectory and events
+                    successful_analyses[tier_name].append(analysis_result)
                 else:
                     failed_analyses[tier_name].append(analysis_result)
         
@@ -289,6 +290,9 @@ Examples:
 
   # Generate both JSON and markdown report
   python run_phase3_only.py --phase2b-file phase2b_analysis_20240101_120000.json --save-report
+
+  # Save output to specific directory
+  python run_phase3_only.py --phase2b-file phase2b_analysis_20240101_120000.json --output-dir results/phase3
         """
     )
     
@@ -296,6 +300,8 @@ Examples:
                        help="Path to Phase 2B results JSON file")
     parser.add_argument("--output-prefix", type=str, default="phase3_synthesis",
                        help="Prefix for output files (default: phase3_synthesis)")
+    parser.add_argument("--output-dir", type=str, default=".",
+                       help="Directory to save output files (default: current directory)")
     parser.add_argument("--save-report", action="store_true",
                        help="Save final report as markdown file")
     parser.add_argument("--verbose", action="store_true",
@@ -324,14 +330,14 @@ Examples:
         
         # Generate output filename with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        json_output = f"{args.output_prefix}_{timestamp}.json"
+        json_output = Path(args.output_dir) / f"{args.output_prefix}_{timestamp}.json"
         
         # Save results
         save_phase3_results(results, json_output)
         
         # Save final report if requested
         if args.save_report:
-            report_output = f"{args.output_prefix}_report_{timestamp}.md"
+            report_output = Path(args.output_dir) / f"{args.output_prefix}_report_{timestamp}.md"
             save_final_report(results, report_output)
             print(f"📄 Final report saved to: {report_output}")
         

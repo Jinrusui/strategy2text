@@ -211,28 +211,28 @@ class HVAAnalyzer:
         """
         self.logger.info("Phase 3: Meta-Summary Synthesis")
         
-        # Extract complete analysis results for synthesis
-        analysis_results = {}
+        # Extract successful analyses with complete context from individual analyses
+        analysis_data = {}
         
         for tier, analyses in individual_analyses.items():
-            analysis_results[tier] = []
+            analysis_data[tier] = []
             
             for analysis in analyses:
                 if "pass_2b_analysis" in analysis:
-                    # Convert HVAAnalyzer format to match Phase 2B format
+                    # Convert to format expected by meta_synthesis
                     formatted_analysis = {
                         "trajectory": analysis["trajectory"],
                         "phase2a_events": analysis["pass_2a_events"],
                         "guided_analysis": analysis["pass_2b_analysis"],
                         "timestamp": analysis["timestamp"]
                     }
-                    analysis_results[tier].append(formatted_analysis)
+                    analysis_data[tier].append(formatted_analysis)
                 elif "error" in analysis:
                     # Skip failed analyses for synthesis
                     self.logger.warning(f"Skipping failed analysis for synthesis: {analysis['error']}")
         
-        # Perform meta-synthesis with complete analysis results
-        final_report = self.gemini_client.meta_synthesis(analysis_results)
+        # Perform meta-synthesis with complete analysis data
+        final_report = self.gemini_client.meta_synthesis(analysis_data)
         
         self.logger.info("Phase 3: Meta-synthesis completed")
         return final_report

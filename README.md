@@ -209,7 +209,49 @@ python run_phase3_only.py \
     --save-report
 ```
 
+### Phase-by-Phase Execution
 
+You can also run each phase individually for more control:
+
+```bash
+# Phase 1: Trajectory Sampling
+python run_phase1_only.py --video-dir hva_videos --output-dir results/phase1
+
+# Phase 2A: Event Detection
+python run_phase2a_only.py --phase1-file results/phase1/phase1_sampling_*.json --output-dir results/phase2a
+
+# Phase 2B: Guided Analysis
+python run_phase2b_only.py --phase2a-file results/phase2a/phase2a_events_*.json --output-dir results/phase2b
+
+# Phase 3: Meta-Synthesis
+python run_phase3_only.py --phase2b-file results/phase2b/phase2b_analysis_*.json --save-report --output-dir results/phase3
+```
+
+## Video-Referenced Analysis Reports
+
+The HVA-X Phase 3 meta-synthesis now generates reports with **specific video references and timestamps**, allowing users to verify insights by watching exact video segments.
+
+### Key Features
+
+- **Precise Video References**: Reports cite specific episodes (e.g., "`seed42` at 00:06-00:14")
+- **Timestamp Accuracy**: All observations include exact time spans for verification
+- **Evidence-Based Claims**: Every major insight is backed by specific video evidence
+- **Comparative Analysis**: Direct comparisons between videos with timestamps
+
+### Example Report Format
+
+```markdown
+The agent demonstrates advanced tunneling in `seed100` at 00:15-00:20, but fails at 
+basic defensive play in `seed42` at 00:22-00:23. This pattern is consistent across 
+episodes, with similar failures visible in `seed420` at 00:16-00:19.
+```
+
+### Benefits
+
+1. **Verification**: Users can immediately locate and verify any claim in the report
+2. **Precision**: Specific timestamps eliminate ambiguity about when events occur
+3. **Research Value**: Enables detailed behavioral analysis with exact references
+4. **Quality Assurance**: Forces the AI to be specific and evidence-based in its analysis
 
 ## 📁 File Formats
 

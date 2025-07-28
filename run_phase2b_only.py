@@ -284,6 +284,9 @@ Examples:
 
   # Run with custom output prefix
   python run_phase2b_only.py --phase2a-file phase2a_events_20240101_120000.json --output-prefix custom_analysis
+
+  # Save output to specific directory
+  python run_phase2b_only.py --phase2a-file phase2a_events_20240101_120000.json --output-dir results/phase2b
         """
     )
     
@@ -291,6 +294,8 @@ Examples:
                        help="Path to Phase 2A results JSON file")
     parser.add_argument("--output-prefix", type=str, default="phase2b_analysis",
                        help="Prefix for output files (default: phase2b_analysis)")
+    parser.add_argument("--output-dir", type=str, default=".",
+                       help="Directory to save output files (default: current directory)")
     parser.add_argument("--verbose", action="store_true",
                        help="Enable verbose logging")
     
@@ -317,10 +322,10 @@ Examples:
         
         # Generate output filename with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = f"{args.output_prefix}_{timestamp}.json"
+        output_file = Path(args.output_dir) / f"{args.output_prefix}_{timestamp}.json"
         
         # Save results
-        save_phase2b_results(results, output_file)
+        save_phase2b_results(results, str(output_file))
         
         # Print summary
         print_phase2b_summary(results)

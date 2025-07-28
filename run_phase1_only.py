@@ -275,6 +275,9 @@ Examples:
 
   # Process all videos directly without stratification
   python run_phase1_only.py --video-dir video_clips_30s --direct-mode
+
+  # Save output to specific directory
+  python run_phase1_only.py --video-dir hva_videos --output-dir results/phase1
         """
     )
     
@@ -288,6 +291,8 @@ Examples:
                        help="Number of samples per performance tier (default: 3)")
     parser.add_argument("--output-prefix", type=str, default="phase1_sampling",
                        help="Prefix for output files (default: phase1_sampling)")
+    parser.add_argument("--output-dir", type=str, default=".",
+                       help="Directory to save output files (default: current directory)")
     parser.add_argument("--verbose", action="store_true",
                        help="Enable verbose logging")
     parser.add_argument("--direct-mode", action="store_true",
@@ -323,10 +328,10 @@ Examples:
         
         # Generate output filename with timestamp
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = f"{args.output_prefix}_{timestamp}.json"
+        output_file = Path(args.output_dir) / f"{args.output_prefix}_{timestamp}.json"
         
         # Save results
-        save_phase1_results(results, output_file)
+        save_phase1_results(results, str(output_file))
         
         # Print summary
         print_phase1_summary(results)

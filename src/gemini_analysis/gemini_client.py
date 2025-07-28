@@ -66,13 +66,14 @@ class GeminiClient:
         return """
 You are an AI assistant analyzing a Breakout RL agent's gameplay video for key moments.
 
-Your task is to identify and timestamp the most important strategic and tactical events. Focus on:
+Your task is to identify and timestamp the most important strategic and tactical events. Focus on, for example:
 
 1.  **Critical Decision Points**: Moments where the agent makes important strategic choices
 2.  **Tactical Errors & Misses**: Significant mistakes, missed opportunities, or clear failures in ball tracking.
 3.  **Strategy Changes**: Points where the agent adapts or changes its brick-clearing approach
 4.  **Key Successes & Skilled Shots**: Moments of effective play or shots indicating advanced ball control.
 5.  **Game State Transitions**: Important changes in game dynamics (e.g., ball speed increase).
+
 
 **OUTPUT FORMAT**: Return ONLY a JSON list of events with this exact structure:
 [
@@ -86,88 +87,80 @@ Your task is to identify and timestamp the most important strategic and tactical
 **IMPORTANT**: 
 - Provide timestamps in MM:SS-MM:SS format (e.g., "0:15-0:20")
 - Keep event descriptions concise (1-2 sentences max)
-- Include 5-10 most important events only
+- Include important events as much as possible
 - Return valid JSON format only - no additional text or explanations
 """
     
     def _get_guided_analysis_prompt(self) -> str:
-        """Get the guided analysis prompt template for Phase 2b of HVA-X."""
+        """Get the guided analysis prompt template for Phase 2b of HVA-X, focusing on evidence-based reasoning."""
         return """
-You are an expert RL analyst conducting a comprehensive analysis of a Breakout agent's gameplay.
+You are analyzing a Breakout RL agent's gameplay using only the event descriptions below as your source of information.
 
-**KEY MOMENTS FOR FOCUSED ANALYSIS:**
+**EVENT DESCRIPTIONS:**
 {key_events}
 
-Using the key moments above as focal points, provide a detailed analysis covering the framework below.
+**ANALYSIS FRAMEWORK:**
+1. Summarize the sequence of events and the agent's observable actions, and the results of the strategy if good or bad, like number of scores, number of lives lost, etc.
+2. Describe any patterns or repeated behaviors that are evident from the events.
+3. Highlight clear successes or failures, as described in the events and the results of the strategy.
+4. Comment on the agent's consistency and any changes in behavior, as supported by the events.
 
-## Strategic & Tactical Analysis Framework
 
-### 1. Overall Brick-Clearing Strategy
-- Describe the agent's primary method for clearing bricks (e.g., tunneling, side-clearing, random).
-- Analyze its risk management profile (e.g., plays conservatively in the center vs. takes risks at the edges).
-- Note any adaptation in strategy as the brick pattern changes.
-
-### 2. Paddle Control & Ball Striking Technique
-- **Responsiveness:** How quickly and accurately does the agent react to the ball's speed and trajectory? Note any visible lag or overcorrection.
-- **Striking Method:** Does the agent simply position itself under the ball, or does it show evidence of using the paddle's edges to intentionally control the ball's angle?
-- **Positioning:** Describe its default paddle position and movement patterns during play.
-
-### 3. Performance Consistency & Failure Analysis
-- **Consistency:** How does the agent's performance change across different lives in the video? Is it consistent, or does its skill degrade?
-- **Failure Points:** Analyze the agent's misses. Does it fail predictably in certain situations (e.g., high-speed balls, sharp angles)? Use the 'tactical_error' events as evidence.
-
-### 4. Quantitative Performance Summary (Estimate if necessary)
-- **Overall Score:** State the final score of the episode.
-- **Miss Rate:** How many lives were lost?
-- **Brick Clearing Efficiency:** Comment on how effectively it cleared bricks relative to the time played.
-
-### 5. Summary of Strengths & Weaknesses
-- Based on the above, what are the agent's primary strategic strengths and tactical limitations?
-
-**CONCLUSION**: End with a 3-sentence summary capturing the agent's strategic profile, its key paddle skill, and its overall effectiveness.
+Base your analysis entirely on the information provided above.
 """
     
     def _get_meta_synthesis_prompt(self) -> str:
-        """Get the meta-synthesis prompt for Phase 3 of HVA-X."""
+        """Get the meta-synthesis prompt for Phase 3 of HVA-X, focusing on comprehensive, evidence-based synthesis."""
         return """
-You are a lead RL analyst synthesizing multiple gameplay analyses that include **events with time spans** to create a cohesive, time-aligned agent evaluation report.
+You are synthesizing multiple gameplay analyses from different seeds to create a comprehensive evaluation report of a Breakout RL agent.
 
 **ANALYSIS DATA:**
 {all_summaries}
 
-Your task is to synthesize these individual analyses into a cohesive, high-level report, **highlighting key behavioral patterns, successes, or failure modes within specific time spans.** This allows the reader to map insights directly to real-time video segments.
+Your task is to integrate the information from all seeds into a cohesive, high-level report that references specific videos and time spans throughout. This allows readers to verify insights by watching exact video segments.
 
-## Synthesis Framework (Time-Aligned)
+Although the same agent may present different performance or behavior in different seeds, use all the information to form an overall assessment. There is no need to artificially balance good and bad aspects—if the evidence points to the agent being strong or weak overall, state this clearly.
 
-### 1. Differentiators of Performance
+## Critical Requirements for Video References
 
-* Identify specific strategies, paddle techniques, or behaviors that separate high-scoring episodes from low-scoring ones.
-* Correlate quantitative metrics (e.g., miss rate, score delta) with final performance tiers.
-* Highlight **common failure modes** and **notable turning points**, referencing the **time spans** they occurred in.
+Throughout your analysis, reference specific videos using the exact format "`seedXXX` at MM:SS-MM:SS".
 
-### 2. Agent Competence Profile
+Examples:
+- "`seed0` at 00:15-00:20" (for observations in seed0 video from 15-20 seconds)
+- "`seed42` at 00:06-00:14" (for observations in seed42 video from 6-14 seconds)
+- "while `seed100` shows tunneling at 00:12-00:15, `seed420` fails defensively at 00:18-00:21"
 
-* **Core Strategy:** Describe the agent's dominant brick-clearing strategy across episodes.
-* **Tactical Skill:** Assess paddle control—does the agent apply angle control or play reactively?
-* **Strengths & Weaknesses:** Pinpoint consistent strengths (e.g., wall tunneling, multi-ball defense) and weaknesses (e.g., speed tracking, edge bounces), aligned with **time-based patterns**.
+## Synthesis Framework (Video-Referenced)
 
-### 3. Time-Based Consistency & Reliability
+1. Executive Summary  
+   Provide a 2-3 sentence overview of the agent's overall competence, referencing specific examples with video IDs and timestamps.
 
-* How consistent is the agent’s behavior over time?
-* Are there **recurrent time windows** where performance degrades or improves (e.g., minute 15-18s often marks a drop in paddle accuracy)? 
-* Identify **critical time spans** showing performance volatility or reliability.
+2. Strategic Analysis  
+   Analyze the agent's core strategies across episodes, citing specific video evidence:
+   - Primary approaches and their results, with video examples.
+   - Consistency or variation in strategy execution across seeds.
+   - Adaptation to game state, with supporting references.
 
-## Final Report Format (≤ 350 words)
+3. Tactical Skill Assessment  
+   Evaluate paddle control and reaction skills with precise references:
+   - Offensive and defensive skills, with supporting video/timestamp examples.
+   - Consistency and variation across seeds.
 
-Structure your report with these sections:
+4. Performance Differentiators  
+   Identify what separates high vs. low performance episodes:
+   - Behaviors leading to success or failure, with specific references.
+   - Critical decision points, using video/timestamp citations.
 
-1. **Executive Summary** (3 sentences summarizing skill, consistency, and behavioral trends with reference to time spans).
-2. **Detailed Strategic Profile** (Analysis of core strategy, with time-based highlights).
-3. **Tactical Skill Assessment** (Paddle control and reaction quality, linked to specific spans).
-4. **Performance Analysis** (Key patterns, risk moments, and high/low performance time spans).
-5. **Conclusion & Recommendations** (Summary assessment and improvement areas with referenced time spans).
+5. Failure Mode Analysis if detected  
+   Categorize and reference specific failure patterns:
+   - Recurring or situational mistakes, with video evidence.
+   - Recovery patterns, with supporting moments.
 
-Keep the report under 350 words and prioritize **time-based insights** that let users link findings to exact video segments.
+**Length**: Keep the report concise but comprehensive (400-600 words).
+**Focus**: Prioritize insights that can be verified through specific video references.
+**Structure**: Use clear section headers and maintain logical flow from general to specific observations.
+
+Base your synthesis entirely on the information provided above.
 """
 
     def _wait_for_file_active(self, uploaded_file: Any, max_wait_time: int = 120) -> None:
@@ -361,32 +354,61 @@ Keep the report under 350 words and prioritize **time-based insights** that let 
         
         raise Exception("Guided analysis failed after all retries")
 
-    def meta_synthesis(self, all_summaries: Dict[str, List[str]], max_retries: int = 3) -> str:
+    def meta_synthesis(self, all_analyses: Dict[str, List[Dict]], max_retries: int = 3) -> str:
         """
-        Phase 3: Synthesize all individual analyses into a comprehensive report.
+        Phase 3: Synthesize all individual analyses into a comprehensive report with video references.
         
         Args:
-            all_summaries: Dictionary with tier names as keys and lists of summaries as values
+            all_analyses: Dictionary with tier names as keys and lists of analysis dictionaries as values
+                         Each analysis dict contains: trajectory, phase2a_events, guided_analysis, etc.
             max_retries: Maximum number of retry attempts
             
         Returns:
-            Final synthesized report
+            Final synthesized report with video references and timestamps
         """
         for attempt in range(max_retries):
             try:
-                # Format all summaries for the prompt
+                # Format all analyses for the prompt with video and timestamp context
                 formatted_summaries = []
-                for tier, summaries in all_summaries.items():
+                for tier, analyses in all_analyses.items():
                     formatted_summaries.append(f"\n=== {tier.upper()} PERFORMANCE TIER ===\n")
-                    for i, summary in enumerate(summaries, 1):
-                        formatted_summaries.append(f"\n--- {tier.title()} Tier Analysis {i} ---\n{summary}\n")
+                    for i, analysis in enumerate(analyses, 1):
+                        trajectory = analysis.get("trajectory", {})
+                        events = analysis.get("phase2a_events", [])
+                        guided_text = analysis.get("guided_analysis", "")
+                        
+                        episode_id = trajectory.get("episode_id", f"Episode {i}")
+                        
+                        # Extract seed number from episode_id for video referencing
+                        import re
+                        seed_match = re.search(r'seed[_]?(\d+)', episode_id) # Match 'seed_3' or 'seed3'
+                        if seed_match:
+                            seed_ref = f"seed{seed_match.group(1)}"
+                        else:
+                            seed_ref = episode_id
+                        
+                        # Format analysis with video context
+                        formatted_summaries.append(f"\n--- {tier.title()} Tier Analysis {i}: {seed_ref} ---")
+                        
+                        # Add key events with timestamps for context
+                        if events:
+                            formatted_summaries.append(f"\n**Key Events Detected in {seed_ref}:**")
+                            for event in events:
+                                timestamp = event.get("timestamp", "Unknown")
+                                event_desc = event.get("event", "Event")
+                                event_type = event.get("type", "unknown")
+                                formatted_summaries.append(f"- {timestamp}: {event_desc} ({event_type})")
+                        
+                        # Add the guided analysis with video reference context
+                        formatted_summaries.append(f"\n**Analysis for {seed_ref}:**\n{guided_text}\n")
                 
                 summaries_text = "\n".join(formatted_summaries)
                 
                 # Create meta-synthesis prompt
                 prompt = self.prompts["meta_synthesis"].format(all_summaries=summaries_text)
                 
-                self.logger.info(f"Performing meta-synthesis of {sum(len(s) for s in all_summaries.values())} analyses")
+                total_analyses = sum(len(analyses) for analyses in all_analyses.values())
+                self.logger.info(f"Performing meta-synthesis of {total_analyses} analyses with video references")
                 
                 # Generate meta-synthesis (text-only, no video needed)
                 response = self.client.models.generate_content(

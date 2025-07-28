@@ -231,3 +231,5 @@ websockets==15.0.1
 wheel==0.45.1
 widgetsnbextension==4.0.14
 zstandard @ file:///croot/zstandard_1731356346222/work
+ale-py
+hackatari
