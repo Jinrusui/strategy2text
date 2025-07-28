@@ -57,3 +57,9 @@ For each condition (e.g., Condition A - paddle on the left), the following loop 
         *   If the distribution curves are nearly identical, it indicates the model is free of this causal hallucination.
         *   If the peaks of the curves shift in correspondence with the paddle's position (left, middle, right), it provides strong evidence of a significant causal hallucination.
     *   **Accuracy Test (Optional):** You can also calculate the model's prediction accuracy (e.g., Mean Absolute Error - MAE) by comparing the predicted and ground truth landing positions. This primarily evaluates its predictive capability, while the comparison of the distribution plots is the key to testing for hallucination.
+
+
+
+
+
+I want use gemini to predict the x location of the where it ends, and now I ahve reocrd the video. but I think directly precit wihtout any information about the axis is very difficult to finish the task. maybe we can add a axis and label and scale it obey the breakout env to give some visual inforrmation to t he model. so i need you to add the axis on the video 
